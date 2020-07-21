@@ -1,0 +1,91 @@
+# Star Wars: The Old Republic Settings Updater
+
+A library to update the `*_PlayerGUIState.ini` settings for all your characters.
+
+## Example of usage
+
+```python
+import logging
+from swtor_settings_updater import *
+
+
+def my_settings(server_id, character_name, s):
+    # swtor_settings_updater.Chat sets the ChatChannels, Chat_Custom_Channels
+    # and ChatColors settings.
+    chat = Chat()
+    chn = chat.standard_channels
+
+    chn.group.color = chn.ops.color
+
+    chat.panel("General")
+    other = chat.panel("Other")
+
+    # Any channels not explicitly displayed on a panel will be displayed on
+    # the first panel (General).
+    other.display(
+        # chn.trade,
+        # chn.pvp,
+        # chn.general,
+        chn.emote,
+        chn.yell,
+        chn.officer,
+        chn.guild,
+        chn.say,
+        chn.whisper,
+        chn.ops,
+        chn.ops_leader,
+        chn.group,
+        chn.ops_announcement,
+        chn.ops_officer,
+        # chn.combat_information,
+        # chn.conversation,
+        chn.character_login,
+        chn.ops_information,
+        # chn.system_feedback,
+        chn.guild_information,
+        chn.group_information,
+        # chn.server_admin,
+        chn.error,
+    )
+
+    if character_name not in ["Kai Zykken", "Plagueis"]:
+        chat.custom_channel("Gsf")
+
+        if server_id == "he4000":
+            chat.custom_channel("Redleader")
+            chat.custom_channel("Narwhal")
+
+            myguild = chat.custom_channel("Myguild")
+            myguild.color = chn.guild.color
+            other.display(myguild)
+
+        elif server_id in ["he3000", "he3001"]:
+            chat.custom_channel("Endgame")
+
+    chat.apply(s)
+
+    s["Show_Chat_TimeStamp"] = "true"
+    s["GUI_Current_Profile"] = "myprofile"
+    s["GUI_WelcomeWindowIsOpen"] = "false"
+    s["GUI_ShowCompletedReputations"] = "false"
+    s["GUI_ShowUnstartedReputations"] = "false"
+    s["GUI_ShowAlignment"] = "true"
+    s["GUI_InvitesAsSocialMessage"] = "true"
+    s["GUI_ShowCooldownText"] = "true"
+    s["GUI_CooldownStyle"] = "3"
+    s["GUI_GCDStyle"] = "1"
+    s["GUI_MiniMapZoom"] = "0.842999994755"
+    s["GUI_MapFadeTo"] = "50.0"
+    s["GUI_GCConfirmOpenPack"] = "false"
+    s["GUI_ConfirmAmplifierCharge"] = "false"
+    s["GUI_InventoryAutoCloseBank"] = "false"
+    s["GUI_InventoryAutoCloseVendor"] = "false"
+    s["GUI_QuickslotLockState"] = "true"
+    s["GUI_WhoListNumberInChat"] = "0"
+    s["GroupFinder_Operation_InProgress"] = "true"
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    Character().update_all(SETTINGS_DIR, my_settings)
+```

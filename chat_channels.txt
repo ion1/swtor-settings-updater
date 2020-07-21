@@ -1,0 +1,85 @@
+Default:
+ChatColors = b3ecff;ff7397;ff8022;a59ff3;eeee00;eeee00;B3ECFF;B3ECFF;B3ECFF;1d8cfe;82ec89;FF00FF;EFBC55;317A3C;eeee00;FF0000;eeee00;ff7f7f;EEEE00;EEEE00;EEEE00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;FF5400;eeee00;eeee00;eeee00;A00000;C92E56;BB4FD2;1FAB29;FF6600;
+
+The ChatColors indices match the displayed channels bitmask.
+
+Say                 b3ecff   0
+Yell                ff7397   1
+Emote               ff8022   2
+Whisper             a59ff3   3
+Unused 1            eeee00   4
+Unused 2            eeee00   5
+General             b3ecff   6
+Trade               b3ecff   7
+PvP                 b3ecff   8
+Group               1d8cfe   9
+Guild               82ec89  10
+Officer             ff00ff  11
+Ops                 efbc55  12
+Ops Officer         317a3c  13
+Unused 3            eeee00  14
+Error               ff0000  15
+Unused 4            eeee00  16
+Server Admin        ff7f7f  17
+System Feedback     eeee00  18
+Conversation        eeee00  19
+Character Login     eeee00  20
+Unused 5            eeee00  21
+Custom 1            eeee00  22
+Custom 2            eeee00  23
+Custom 3            eeee00  24
+Custom 4            eeee00  25
+Custom 5            eeee00  26
+Custom 6            eeee00  27
+Custom 7            eeee00  28
+Ops Leader          ff5400  29
+Unused 6            eeee00  30
+Unused 7            eeee00  31
+Unused 8            eeee00  32
+Ops Announcement    a00000  33
+Ops Information     c92e56  34
+Group Information   bb4fd2  35
+Guild Information   1fab29  36
+Combat Information  ff6600  37
+
+Ordering in the UI:
+
+Global Channels:
+Trade
+PvP
+General
+
+Player Channels:
+Emote
+Yell
+Officer
+Guild
+Say
+Whisper
+Ops
+Ops Leader
+Group
+Ops Announcement
+Ops Officer
+
+System Channels:
+Combat Information
+Conversation
+Character Login
+Ops Information
+System Feedback
+Guild Information
+Group Information
+
+Personal Channels:
+Custom 1
+Custom 2
+Custom 3
+Custom 4
+Custom 5
+Custom 6
+Custom 7
+
+Not shown:
+Error
+System Feedback
