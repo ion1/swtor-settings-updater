@@ -27,20 +27,29 @@ def test_cp1252_printable_does_not_include_control_characters():
 
 
 @st.composite
-def characters_and_exclusions(draw):
+def characters_and_valid_exclusions(draw):
     characters = draw(st.lists(st.characters(), min_size=1).map(lambda l: "".join(l)))
-    exclusions = draw(
-        st.lists(st.one_of(st.sampled_from(characters), st.characters())).map(
-            lambda l: "".join(l)
-        )
-    )
+    exclusions = draw(st.lists(st.sampled_from(characters)).map(lambda l: "".join(l)))
 
     assume(set(characters) - set(exclusions))
 
     return (characters, exclusions)
 
 
-@given(characters_and_exclusions())
+@st.composite
+def characters_and_invalid_exclusions(draw):
+    characters = draw(st.lists(st.characters(), min_size=1).map(lambda l: "".join(l)))
+    exclusions = draw(st.lists(st.characters(), min_size=1).map(lambda l: "".join(l)))
+
+    assume(set(characters) - set(exclusions))
+
+    # There are exclusions which are not part of the original character set.
+    assume(set(exclusions) - set(characters))
+
+    return (characters, exclusions)
+
+
+@given(characters_and_valid_exclusions())
 def test_regex_character_class(characters_exclusions):
     characters, exclusions = characters_exclusions
 
@@ -52,6 +61,14 @@ def test_regex_character_class(characters_exclusions):
 
     if characters_excluded != characters:
         assert not regex.fullmatch(re, characters)
+
+
+@given(characters_and_invalid_exclusions())
+def test_regex_character_class_fails_given_invalid_exclusions(characters_exclusions):
+    characters, exclusions = characters_exclusions
+
+    with pytest.raises(ValueError):
+        regex_character_class(characters, exclusions)
 
 
 def test_regex_character_class_fails_given_empty_class():

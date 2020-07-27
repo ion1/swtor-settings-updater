@@ -12,6 +12,12 @@ def regex_character_class(characters, exclusions=""):
     ranges = []
     current_range = None
 
+    exclusions_not_in_characters = set(exclusions) - set(characters)
+    if exclusions_not_in_characters:
+        raise ValueError(
+            f"Tried to exclude {''.join(exclusions_not_in_characters)!r} from {''.join(characters)!r}"
+        )
+
     characters_excluded = sorted(set(characters) - set(exclusions))
 
     if not characters_excluded:
