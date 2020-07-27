@@ -2,7 +2,13 @@
 
 A library to update the `*_PlayerGUIState.ini` settings for all your characters.
 
-## Example of usage
+## Usage
+
+* **Create a backup of `%LOCALAPPDATA%\SWTOR\swtor\settings`.**
+* Run `pip install swtor-settings-updater`.
+* Create a `my_settings.py` corresponding to the settings you want to apply
+  to your characters (an example follows).
+* Run the script.
 
 ```python
 import logging
