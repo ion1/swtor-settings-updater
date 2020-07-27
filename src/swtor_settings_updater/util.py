@@ -16,7 +16,7 @@ def regex_character_class(characters, exclusions=""):
 
     if not characters_excluded:
         raise ValueError(
-            f"Empty character class: {repr(characters)} - {repr(exclusions)}"
+            f"Empty character class: {''.join(characters)!r} - {''.join(exclusions)!r}"
         )
 
     for c in characters_excluded:

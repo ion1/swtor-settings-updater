@@ -213,7 +213,7 @@ class ChatRules(sta.RuleBasedStateMachine):
         assert not missing_ixs, "A channel is not displayed in any panel"
         assert not extra_ixs, "An impossible channel is displayed in a panel"
 
-        for (panel, panel_s) in zip(self.panels.values(), panels_s):
+        for (panel_s, panel) in zip(panels_s, self.panels.values()):
             assert panel_s.number == panel.number
             assert panel_s.name == panel.name
 
@@ -239,8 +239,8 @@ class ChatRules(sta.RuleBasedStateMachine):
 
         assert len(custom_channels_s) == len(self.custom_channels)
 
-        for cc, cc_s in zip(self.custom_channels.values(), custom_channels_s):
-            assert cc == cc_s
+        for cc_s, cc in zip(custom_channels_s, self.custom_channels.values()):
+            assert cc_s == cc
 
     # The ChatColors setting
 
@@ -255,6 +255,7 @@ class ChatRules(sta.RuleBasedStateMachine):
 
 
 TestChat = ChatRules.TestCase
+
 
 PanelSetting = namedtuple("PanelSetting", ["number", "name", "channel_ixs"])
 
