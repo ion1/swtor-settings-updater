@@ -50,8 +50,8 @@ def my_settings(server_id, character_name, s):
         # chn.system_feedback,
         chn.guild_information,
         chn.group_information,
-        # chn.server_admin,
         chn.error,
+        # chn.server_admin,
     )
 
     if character_name not in ["Kai Zykken", "Plagueis"]:
