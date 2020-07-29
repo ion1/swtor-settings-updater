@@ -89,6 +89,7 @@ def my_settings(server_id, character_name, s):
     s["GUI_QuickslotLockState"] = "true"
     s["GUI_WhoListNumberInChat"] = "0"
     s["GroupFinder_Operation_InProgress"] = "true"
+    s["GUI_CraftingMoveQuality"] = "6"
 
 
 if __name__ == "__main__":
