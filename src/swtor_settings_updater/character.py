@@ -31,7 +31,7 @@ class Character:
             filename,
         )
         if not match:
-            raise ValueError(f"Unrecognized filename: {repr(filename)}")
+            raise ValueError(f"Unrecognized filename: {filename!r}")
 
         server_id = match.group("server_id")
         character_name = match.group("character_name")

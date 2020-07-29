@@ -31,6 +31,7 @@ def characters_and_valid_exclusions(draw):
     characters = draw(st.lists(st.characters(), min_size=1).map(lambda l: "".join(l)))
     exclusions = draw(st.lists(st.sampled_from(characters)).map(lambda l: "".join(l)))
 
+    # The resulting set can not be empty.
     assume(set(characters) - set(exclusions))
 
     return (characters, exclusions)
@@ -41,9 +42,10 @@ def characters_and_invalid_exclusions(draw):
     characters = draw(st.lists(st.characters(), min_size=1).map(lambda l: "".join(l)))
     exclusions = draw(st.lists(st.characters(), min_size=1).map(lambda l: "".join(l)))
 
+    # The resulting set can not be empty.
     assume(set(characters) - set(exclusions))
 
-    # There are exclusions which are not part of the original character set.
+    # There should be exclusions which are not part of the original character set.
     assume(set(exclusions) - set(characters))
 
     return (characters, exclusions)
@@ -53,12 +55,13 @@ def characters_and_invalid_exclusions(draw):
 def test_regex_character_class(characters_exclusions):
     characters, exclusions = characters_exclusions
 
-    characters_excluded = "".join(filter(lambda c: c not in exclusions, characters))
-
     re = regex.compile(f"[{regex_character_class(characters, exclusions)}]*")
 
+    # A string of all characters which should be matched by the regex.
+    characters_excluded = "".join(filter(lambda c: c not in exclusions, characters))
     assert regex.fullmatch(re, characters_excluded)
 
+    # If there are exclusions, the regex should not match the original characters.
     if characters_excluded != characters:
         assert not regex.fullmatch(re, characters)
 

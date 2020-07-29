@@ -147,7 +147,6 @@ class Chat:
 
     def panels_setting(self):
         """Compute the value for the panels setting (ChatChannels)."""
-
         if self.panels:
             panels = self.panels.values()
         else:

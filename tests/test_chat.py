@@ -187,7 +187,7 @@ class ChatRules(sta.RuleBasedStateMachine):
     @sta.invariant()
     def channels_setting_has_a_default_panel(self):
         setting = self.chat.panels_setting()
-        # note(f'panels_setting: {setting!r}')
+        # note(f"panels_setting: {setting!r}")
 
         panels_s = parse_panels(setting)
 
@@ -197,7 +197,7 @@ class ChatRules(sta.RuleBasedStateMachine):
     @sta.invariant()
     def channels_setting_is_correct(self):
         setting = self.chat.panels_setting()
-        # note(f'channels_setting: {setting!r}')
+        # note(f"channels_setting: {setting!r}")
 
         panels_s = parse_panels(setting)
 
@@ -233,7 +233,7 @@ class ChatRules(sta.RuleBasedStateMachine):
     @sta.invariant()
     def custom_channels_setting_is_correct(self):
         setting = self.chat.custom_channels_setting()
-        # note(f'custom_channels_setting: {setting!r}')
+        # note(f"custom_channels_setting: {setting!r}")
 
         custom_channels_s = parse_custom_channels(setting)
 
@@ -247,7 +247,7 @@ class ChatRules(sta.RuleBasedStateMachine):
     @sta.invariant()
     def colors_setting_is_correct(self):
         setting = self.chat.colors_setting()
-        # note(f'colors_setting: {setting!r}')
+        # note(f"colors_setting: {setting!r}")
 
         colors_s = parse_colors(setting)
 
