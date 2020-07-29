@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "swtor-settings-updater"
-version = "0.0.1"
+version = "0.0.2"
 description = "Star Wars: The Old Republic Settings Updater"
 readme = "README.md"
 homepage = "https://github.com/ion1/swtor-settings-updater"
