@@ -16,6 +16,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.8"
+atomicwrites = "^1.4.0"
 regex = ">=2020.7.14"
 
 [tool.poetry.dev-dependencies]

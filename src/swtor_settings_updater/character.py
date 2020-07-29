@@ -1,3 +1,4 @@
+from atomicwrites import atomic_write
 import configparser
 import glob
 import logging
@@ -43,11 +44,8 @@ class Character:
 
         callback(server_id, character_name, parser["Settings"])
 
-        path_new = f"{path}.new"
-        with open(path_new, "w", encoding="CP1252", newline="\r\n") as f:
+        with atomic_write(path, encoding="CP1252", newline="\r\n", overwrite=True) as f:
             parser.write(f)
-
-        os.replace(path_new, path)
 
     def _config_parser(self):
         parser = configparser.ConfigParser(interpolation=None)

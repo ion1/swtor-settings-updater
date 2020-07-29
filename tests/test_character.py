@@ -78,7 +78,13 @@ def settings_dir(tmp_path):
     settings_file_b.write_bytes(SETTINGS_FILE_B_CONTENT_BEFORE)
     other_file.write_bytes(OTHER_FILE_CONTENT)
 
-    return tmp_path
+    yield tmp_path
+
+    # The code should not leave extra files behind (or delete existing files
+    # for that matter).
+    assert set(map(lambda p: p.name, tmp_path.iterdir())) == set(
+        [SETTINGS_FILENAME_A, SETTINGS_FILENAME_B, OTHER_FILENAME]
+    )
 
 
 def test_character_update_path_parses_filename(settings_dir):
