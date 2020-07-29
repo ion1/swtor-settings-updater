@@ -1,6 +1,4 @@
 import configparser
-from hypothesis import given
-import hypothesis.strategies as st
 import pytest
 
 from swtor_settings_updater.character import Character, OptionTransformer
@@ -104,6 +102,22 @@ def test_character_update_path_updates_settings(settings_dir):
     Character().update_path(settings_filepath, update_settings)
 
     assert settings_filepath.read_bytes() == SETTINGS_FILE_A_CONTENT_AFTER
+
+
+def test_character_update_path_does_not_modify_settings_given_invalid_characters(
+    settings_dir,
+):
+    """The settings files are encoded in CP1252."""
+    settings_filepath = settings_dir / SETTINGS_FILENAME_A
+
+    def update_settings_invalid(_server_id, _character_name, s):
+        s["Invalid"] = "√☃🤦"
+
+    with pytest.raises(UnicodeEncodeError):
+        Character().update_path(settings_filepath, update_settings_invalid)
+
+    # The file must be unchanged.
+    assert settings_filepath.read_bytes() == SETTINGS_FILE_A_CONTENT_BEFORE
 
 
 def test_character_update_all_updates_settings(settings_dir):
