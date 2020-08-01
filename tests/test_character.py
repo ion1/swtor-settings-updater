@@ -84,8 +84,11 @@ def settings_dir(tmp_path):
     # for that matter).
     assert set(map(lambda p: p.name, tmp_path.iterdir())) == set(
         [SETTINGS_FILENAME_A, SETTINGS_FILENAME_B, OTHER_FILENAME]
-    )
+    ), "A file was added or removed in the settings directory"
 
+    assert (
+        other_file.read_bytes() == OTHER_FILE_CONTENT
+    ), "An unrelated file was modified in the settings directory"
 
 def test_character_update_path_parses_filename(settings_dir):
     settings_filepath = settings_dir / SETTINGS_FILENAME_A
@@ -103,11 +106,18 @@ def test_character_update_path_parses_filename(settings_dir):
 
 
 def test_character_update_path_updates_settings(settings_dir):
-    settings_filepath = settings_dir / SETTINGS_FILENAME_A
+    settings_filepath_a = settings_dir / SETTINGS_FILENAME_A
+    settings_filepath_b = settings_dir / SETTINGS_FILENAME_B
 
-    Character().update_path(settings_filepath, update_settings)
+    Character().update_path(str(settings_filepath_a), update_settings)
 
-    assert settings_filepath.read_bytes() == SETTINGS_FILE_A_CONTENT_AFTER
+    assert (
+        settings_filepath_a.read_bytes() == SETTINGS_FILE_A_CONTENT_AFTER
+    ), "The settings file was not modified in the expected way"
+
+    assert (
+        settings_filepath_b.read_bytes() == SETTINGS_FILE_B_CONTENT_BEFORE
+    ), "Another settings file was modified unexpectedly"
 
 
 def test_character_update_path_does_not_modify_settings_given_invalid_characters(
@@ -129,13 +139,11 @@ def test_character_update_path_does_not_modify_settings_given_invalid_characters
 def test_character_update_all_updates_settings(settings_dir):
     settings_filepath_a = settings_dir / SETTINGS_FILENAME_A
     settings_filepath_b = settings_dir / SETTINGS_FILENAME_B
-    other_filepath = settings_dir / OTHER_FILENAME
 
     Character().update_all(settings_dir, update_settings)
 
     assert settings_filepath_a.read_bytes() == SETTINGS_FILE_A_CONTENT_AFTER
     assert settings_filepath_b.read_bytes() == SETTINGS_FILE_B_CONTENT_AFTER
-    assert other_filepath.read_bytes() == OTHER_FILE_CONTENT
 
 
 def test_option_transformer_preserves_case():
