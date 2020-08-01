@@ -14,82 +14,89 @@ DEFAULT_COLOR = Color(238, 238, 0)
 
 
 @dc.dataclass
+class Channel:
+    name: str
+    ix: int
+    color: Color = dc.field(default_factory=lambda: DEFAULT_COLOR.copy())
+
+
+@dc.dataclass
 class StandardChannels:
     # Global Channels
-    trade: Color = dc.field(
+    trade: Channel = dc.field(
         default_factory=lambda: Channel("Trade", 7, (Color(179, 236, 255)))
     )
-    pvp: Color = dc.field(
+    pvp: Channel = dc.field(
         default_factory=lambda: Channel("PvP", 8, (Color(179, 236, 255)))
     )
-    general: Color = dc.field(
+    general: Channel = dc.field(
         default_factory=lambda: Channel("General", 6, (Color(179, 236, 255)))
     )
 
     # Player Channels
-    emote: Color = dc.field(
+    emote: Channel = dc.field(
         default_factory=lambda: Channel("Emote", 2, (Color(255, 128, 34)))
     )
-    yell: Color = dc.field(
+    yell: Channel = dc.field(
         default_factory=lambda: Channel("Yell", 1, (Color(255, 115, 151)))
     )
-    officer: Color = dc.field(
+    officer: Channel = dc.field(
         default_factory=lambda: Channel("Officer", 11, (Color(255, 0, 255)))
     )
-    guild: Color = dc.field(
+    guild: Channel = dc.field(
         default_factory=lambda: Channel("Guild", 10, (Color(130, 236, 137)))
     )
-    say: Color = dc.field(
+    say: Channel = dc.field(
         default_factory=lambda: Channel("Say", 0, (Color(179, 236, 255)))
     )
-    whisper: Color = dc.field(
+    whisper: Channel = dc.field(
         default_factory=lambda: Channel("Whisper", 3, (Color(165, 159, 243)))
     )
-    ops: Color = dc.field(
+    ops: Channel = dc.field(
         default_factory=lambda: Channel("Ops", 12, (Color(239, 188, 85)))
     )
-    ops_leader: Color = dc.field(
+    ops_leader: Channel = dc.field(
         default_factory=lambda: Channel("Ops Leader", 29, (Color(255, 84, 0)))
     )
-    group: Color = dc.field(
+    group: Channel = dc.field(
         default_factory=lambda: Channel("Group", 9, (Color(29, 140, 254)))
     )
-    ops_announcement: Color = dc.field(
+    ops_announcement: Channel = dc.field(
         default_factory=lambda: Channel("Ops Announcement", 33, (Color(160, 0, 0)))
     )
-    ops_officer: Color = dc.field(
+    ops_officer: Channel = dc.field(
         default_factory=lambda: Channel("Ops Officer", 13, (Color(49, 122, 60)))
     )
 
     # System Channels
-    combat_information: Color = dc.field(
+    combat_information: Channel = dc.field(
         default_factory=lambda: Channel("Combat Information", 37, (Color(255, 102, 0)))
     )
-    conversation: Color = dc.field(
+    conversation: Channel = dc.field(
         default_factory=lambda: Channel("Conversation", 19, (Color(238, 238, 0)))
     )
-    character_login: Color = dc.field(
+    character_login: Channel = dc.field(
         default_factory=lambda: Channel("Character Login", 20, (Color(238, 238, 0)))
     )
-    ops_information: Color = dc.field(
+    ops_information: Channel = dc.field(
         default_factory=lambda: Channel("Ops Information", 34, (Color(201, 46, 86)))
     )
-    system_feedback: Color = dc.field(
+    system_feedback: Channel = dc.field(
         default_factory=lambda: Channel("System Feedback", 18, (Color(238, 238, 0)))
     )
-    guild_information: Color = dc.field(
+    guild_information: Channel = dc.field(
         default_factory=lambda: Channel("Guild Information", 36, (Color(31, 171, 41)))
     )
-    group_information: Color = dc.field(
+    group_information: Channel = dc.field(
         default_factory=lambda: Channel("Group Information", 35, (Color(187, 79, 210)))
     )
 
     # Not shown in the UI. The default General panel and any panel you
     # create displays these, but the default Other panel does not.
-    error: Color = dc.field(
+    error: Channel = dc.field(
         default_factory=lambda: Channel("Error", 15, (Color(255, 0, 0)))
     )
-    server_admin: Color = dc.field(
+    server_admin: Channel = dc.field(
         default_factory=lambda: Channel("Server Admin", 17, (Color(255, 127, 127)))
     )
 
@@ -223,13 +230,6 @@ class Panel:
 
 
 @dc.dataclass
-class Channel:
-    name: str
-    ix: int
-    color: Color = dc.field(default_factory=lambda: DEFAULT_COLOR.copy())
-
-
-@dc.dataclass
 class CustomChannel(Channel):
     password: str = None
     id: str = None
@@ -249,7 +249,7 @@ class CustomChannel(Channel):
         if self.password is not None and not regex.fullmatch(
             CustomChannel.PASSWORD_REGEX, self.password
         ):
-            raise ValueError(f"Invalid password {password!r}")
+            raise ValueError(f"Invalid password {self.password!r}")
 
         if self.id is not None and not regex.fullmatch(CustomChannel.ID_REGEX, self.id):
             raise ValueError(f"Invalid id {id!r}")
