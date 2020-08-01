@@ -5,7 +5,8 @@ import regex
 from typing import Set
 
 from swtor_settings_updater.color import Color
-from swtor_settings_updater.util import *
+from swtor_settings_updater.util.character_class import *
+from swtor_settings_updater.util.swtor_case import *
 
 CUSTOM_CHANNEL_IXS = range(22, 28 + 1)
 MAXIMUM_IX = 37

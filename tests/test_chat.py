@@ -7,7 +7,7 @@ import regex
 
 from swtor_settings_updater.chat import *
 from swtor_settings_updater.color import Color
-from swtor_settings_updater.util import *
+from swtor_settings_updater.util.swtor_case import *
 
 from test_color import valid_rgb
 

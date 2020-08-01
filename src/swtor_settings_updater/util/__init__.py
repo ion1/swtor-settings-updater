@@ -1,0 +1,2 @@
+import swtor_settings_updater.util.character_class
+import swtor_settings_updater.util.swtor_case

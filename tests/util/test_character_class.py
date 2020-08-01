@@ -4,7 +4,7 @@ import pytest
 import regex
 import unicodedata
 
-from swtor_settings_updater.util import *
+from swtor_settings_updater.util.character_class import *
 
 
 def test_cp1252_printable_encodes_as_cp1252():
@@ -80,21 +80,3 @@ def test_regex_character_class_fails_given_empty_class():
 
     with pytest.raises(ValueError):
         regex_character_class("abc", "abc")
-
-
-@given(st.text())
-def test_swtor_lower(string):
-    lowered = swtor_lower(string)
-    assert len(lowered) == len(string)
-    assert swtor_lower(lowered) == lowered
-    assert swtor_lower(swtor_upper(string)) == lowered
-    assert not regex.match("[A-Z]", lowered)
-
-
-@given(st.text())
-def test_swtor_upper(string):
-    uppered = swtor_upper(string)
-    assert len(uppered) == len(string)
-    assert swtor_upper(uppered) == uppered
-    assert swtor_upper(swtor_lower(string)) == uppered
-    assert not regex.match("[a-z]", uppered)
