@@ -1,3 +1,4 @@
+from __future__ import annotations
 import dataclasses as dc
 
 
@@ -8,13 +9,13 @@ class Color:
     g: int
     b: int
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not (0 <= self.r <= 0xFF and 0 <= self.g <= 0xFF and 0 <= self.b <= 0xFF):
             raise ValueError(f"Invalid {self!r}")
 
-    def hex(self):
+    def hex(self) -> str:
         """Hexadecimal RRGGBB."""
         return "{:0>2x}{:0>2x}{:0>2x}".format(self.r, self.g, self.b)
 
-    def copy(self):
+    def copy(self) -> Color:
         return dc.replace(self)

@@ -2,32 +2,33 @@ from hypothesis import given, assume
 import hypothesis.strategies as st
 import pytest
 import regex
+from typing import Any, Callable, Iterable, Tuple
 import unicodedata
 
 from swtor_settings_updater.util.character_class import *
 
 
-def test_cp1252_printable_encodes_as_cp1252():
+def test_cp1252_printable_encodes_as_cp1252() -> None:
     assert (
         codecs.decode(codecs.encode(CP1252_PRINTABLE, "CP1252"), "CP1252")
         == CP1252_PRINTABLE
     )
 
 
-def test_cp1252_printable_does_not_encode_as_ascii_or_latin1():
+def test_cp1252_printable_does_not_encode_as_ascii_or_latin1() -> None:
     with pytest.raises(ValueError):
         codecs.encode(CP1252_PRINTABLE, "ASCII")
     with pytest.raises(ValueError):
         codecs.encode(CP1252_PRINTABLE, "Latin1")
 
 
-def test_cp1252_printable_does_not_include_control_characters():
+def test_cp1252_printable_does_not_include_control_characters() -> None:
     for c in CP1252_PRINTABLE:
         assert unicodedata.category(c)[0] != "C"
 
 
 @st.composite
-def characters_and_valid_exclusions(draw):
+def characters_and_valid_exclusions(draw: Callable[[Any], Any]) -> Tuple[str, str]:
     characters = draw(st.lists(st.characters(), min_size=1).map(lambda l: "".join(l)))
     exclusions = draw(st.lists(st.sampled_from(characters)).map(lambda l: "".join(l)))
 
@@ -38,7 +39,7 @@ def characters_and_valid_exclusions(draw):
 
 
 @st.composite
-def characters_and_invalid_exclusions(draw):
+def characters_and_invalid_exclusions(draw: Callable[[Any], Any]) -> Tuple[str, str]:
     characters = draw(st.lists(st.characters(), min_size=1).map(lambda l: "".join(l)))
     exclusions = draw(st.lists(st.characters(), min_size=1).map(lambda l: "".join(l)))
 
@@ -52,7 +53,7 @@ def characters_and_invalid_exclusions(draw):
 
 
 @given(characters_and_valid_exclusions())
-def test_regex_character_class(characters_exclusions):
+def test_regex_character_class(characters_exclusions: Tuple[str, str]) -> None:
     characters, exclusions = characters_exclusions
 
     re = regex.compile(f"[{regex_character_class(characters, exclusions)}]*")
@@ -67,14 +68,16 @@ def test_regex_character_class(characters_exclusions):
 
 
 @given(characters_and_invalid_exclusions())
-def test_regex_character_class_fails_given_invalid_exclusions(characters_exclusions):
+def test_regex_character_class_fails_given_invalid_exclusions(
+    characters_exclusions: Tuple[str, str]
+) -> None:
     characters, exclusions = characters_exclusions
 
     with pytest.raises(ValueError):
         regex_character_class(characters, exclusions)
 
 
-def test_regex_character_class_fails_given_empty_class():
+def test_regex_character_class_fails_given_empty_class() -> None:
     with pytest.raises(ValueError):
         regex_character_class("")
 

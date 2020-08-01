@@ -6,7 +6,7 @@ from swtor_settings_updater.util.swtor_case import *
 
 
 @given(st.text())
-def test_swtor_lower(string):
+def test_swtor_lower(string: str) -> None:
     lowered = swtor_lower(string)
     assert len(lowered) == len(string)
     assert swtor_lower(lowered) == lowered
@@ -15,7 +15,7 @@ def test_swtor_lower(string):
 
 
 @given(st.text())
-def test_swtor_upper(string):
+def test_swtor_upper(string: str) -> None:
     uppered = swtor_upper(string)
     assert len(uppered) == len(string)
     assert swtor_upper(uppered) == uppered

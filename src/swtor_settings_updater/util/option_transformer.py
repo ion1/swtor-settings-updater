@@ -1,10 +1,21 @@
+import configparser
+from typing import Dict
+
+
 class OptionTransformer:
     """Prevent ConfigParser from lower-casing key names."""
 
-    def __init__(self):
+    canonical_forms: Dict[str, str]
+
+    def __init__(self) -> None:
         self.canonical_forms = {}
 
-    def xform(self, name):
+    def install(self, parser: configparser.ConfigParser) -> None:
+        """Replace parser.optionxform with a case-preserving version."""
+        # https://github.com/python/mypy/issues/2427
+        parser.optionxform = self.xform  # type: ignore[assignment]
+
+    def xform(self, name: str) -> str:
         name_lower = name.lower()
 
         if name_lower in self.canonical_forms:

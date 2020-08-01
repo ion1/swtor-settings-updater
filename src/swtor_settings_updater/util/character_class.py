@@ -8,7 +8,7 @@ CP1252_PRINTABLE = regex.sub(
 )
 
 
-def regex_character_class(characters, exclusions=""):
+def regex_character_class(characters: str, exclusions: str = "") -> str:
     ranges = []
     current_range = None
 

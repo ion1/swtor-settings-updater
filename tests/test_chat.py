@@ -1,9 +1,11 @@
+from __future__ import annotations
 from collections import OrderedDict, namedtuple
 from hypothesis import given, assume, note
 import hypothesis.stateful as sta
 import hypothesis.strategies as st
 import pytest
 import regex
+from typing import Any, Iterable, List, Optional
 
 from swtor_settings_updater.chat import *
 from swtor_settings_updater.color import Color
@@ -30,7 +32,12 @@ valid_custom_channel_id = st.one_of(
 
 
 class ChatRules(sta.RuleBasedStateMachine):
-    def __init__(self):
+    chat: Chat
+    panels: OrderedDict[str, PanelSetting]
+    custom_channels: OrderedDict[str, CustomChannelsSetting]
+    colors: List[Color]
+
+    def __init__(self) -> None:
         super(ChatRules, self).__init__()
 
         self.chat = Chat()
@@ -46,17 +53,17 @@ class ChatRules(sta.RuleBasedStateMachine):
     standard_channel_refs = sta.Bundle("standard_channels")
 
     @sta.initialize(target=standard_channel_refs)
-    def init_standard_channels(self):
+    def init_standard_channels(self) -> Any:
         return sta.multiple(*self.chat.standard_channels)
 
     # Panels
 
     @sta.invariant()
-    def expected_number_of_panels(self):
+    def expected_number_of_panels(self) -> None:
         assert len(self.chat.panels) == len(self.panels)
 
     @sta.rule(target=panel_refs, name=valid_panel_name)
-    def new_panel(self, name):
+    def new_panel(self, name: str) -> Panel:
         name_lower = swtor_lower(name)
         assume(name_lower not in self.panels.keys())
 
@@ -66,7 +73,7 @@ class ChatRules(sta.RuleBasedStateMachine):
         return self.chat.panel(name)
 
     @sta.rule(panel_c=panel_refs)
-    def existing_panel(self, panel_c):
+    def existing_panel(self, panel_c: Panel) -> None:
         with pytest.raises(ValueError):
             self.chat.panel(panel_c.name)
         with pytest.raises(ValueError):
@@ -77,7 +84,7 @@ class ChatRules(sta.RuleBasedStateMachine):
     # Custom channels
 
     @sta.invariant()
-    def expected_number_of_custom_channels(self):
+    def expected_number_of_custom_channels(self) -> None:
         assert len(self.chat.custom_channels) == len(self.custom_channels)
         assert len(self.chat.custom_channels) <= num_custom_channels
 
@@ -88,7 +95,9 @@ class ChatRules(sta.RuleBasedStateMachine):
         password=valid_custom_channel_password,
         id=valid_custom_channel_id,
     )
-    def new_custom_channel(self, name, password, id):
+    def new_custom_channel(
+        self, name: str, password: Optional[str], id: Optional[str]
+    ) -> CustomChannel:
         name_lower = swtor_lower(name)
         assume(name_lower not in self.custom_channels)
 
@@ -108,7 +117,9 @@ class ChatRules(sta.RuleBasedStateMachine):
         password=valid_custom_channel_password,
         id=valid_custom_channel_id,
     )
-    def new_custom_channel_too_many(self, name, password, id):
+    def new_custom_channel_too_many(
+        self, name: str, password: Optional[str], id: Optional[str]
+    ) -> None:
         name_lower = swtor_lower(name)
         assume(name_lower not in self.custom_channels)
 
@@ -116,7 +127,7 @@ class ChatRules(sta.RuleBasedStateMachine):
             self.chat.custom_channel(name, password=password, id=id)
 
     @sta.rule(custom_channel_c=custom_channel_refs)
-    def existing_custom_channel(self, custom_channel_c):
+    def existing_custom_channel(self, custom_channel_c: CustomChannel) -> None:
         with pytest.raises(ValueError):
             self.chat.custom_channel(custom_channel_c.name)
         with pytest.raises(ValueError):
@@ -130,7 +141,9 @@ class ChatRules(sta.RuleBasedStateMachine):
         panel_c=panel_refs,
         channels_c=st.lists(st.one_of(standard_channel_refs, custom_channel_refs)),
     )
-    def panel_display_channel(self, panel_c, channels_c):
+    def panel_display_channel(
+        self, panel_c: Panel, channels_c: Iterable[Channel]
+    ) -> None:
         for channel_c in channels_c:
             self.panels[swtor_lower(panel_c.name)].channel_ixs.add(channel_c.ix)
 
@@ -142,7 +155,7 @@ class ChatRules(sta.RuleBasedStateMachine):
         channel_c=st.one_of(standard_channel_refs, custom_channel_refs),
         color=valid_color,
     )
-    def replace_channel_color(self, channel_c, color):
+    def replace_channel_color(self, channel_c: Channel, color: Color) -> None:
         self.colors[channel_c.ix] = color
         channel_c.color = color
 
@@ -150,7 +163,7 @@ class ChatRules(sta.RuleBasedStateMachine):
         channel_c=st.one_of(standard_channel_refs, custom_channel_refs),
         color=valid_color,
     )
-    def mutate_channel_color(self, channel_c, color):
+    def mutate_channel_color(self, channel_c: Channel, color: Color) -> None:
         self.colors[channel_c.ix].r = color.r
         self.colors[channel_c.ix].g = color.g
         self.colors[channel_c.ix].b = color.b
@@ -162,14 +175,16 @@ class ChatRules(sta.RuleBasedStateMachine):
         source_channel_c=st.one_of(standard_channel_refs, custom_channel_refs),
         target_channel_c=st.one_of(standard_channel_refs, custom_channel_refs),
     )
-    def link_channel_color(self, source_channel_c, target_channel_c):
+    def link_channel_color(
+        self, source_channel_c: Channel, target_channel_c: Channel
+    ) -> None:
         self.colors[target_channel_c.ix] = self.colors[source_channel_c.ix]
         target_channel_c.color = source_channel_c.color
 
     # Applying the settings
 
     @sta.invariant()
-    def apply_applies_settings(self):
+    def apply_applies_settings(self) -> None:
         settings = {"foo": "bar"}
         self.chat.apply(settings)
 
@@ -185,7 +200,7 @@ class ChatRules(sta.RuleBasedStateMachine):
 
     @sta.precondition(lambda self: not self.panels)
     @sta.invariant()
-    def channels_setting_has_a_default_panel(self):
+    def channels_setting_has_a_default_panel(self) -> None:
         setting = self.chat.panels_setting()
         # note(f"panels_setting: {setting!r}")
 
@@ -195,7 +210,7 @@ class ChatRules(sta.RuleBasedStateMachine):
 
     @sta.precondition(lambda self: self.panels)
     @sta.invariant()
-    def channels_setting_is_correct(self):
+    def channels_setting_is_correct(self) -> None:
         setting = self.chat.panels_setting()
         # note(f"channels_setting: {setting!r}")
 
@@ -231,7 +246,7 @@ class ChatRules(sta.RuleBasedStateMachine):
     # The Chat_Custom_Channels setting
 
     @sta.invariant()
-    def custom_channels_setting_is_correct(self):
+    def custom_channels_setting_is_correct(self) -> None:
         setting = self.chat.custom_channels_setting()
         # note(f"custom_channels_setting: {setting!r}")
 
@@ -245,7 +260,7 @@ class ChatRules(sta.RuleBasedStateMachine):
     # The ChatColors setting
 
     @sta.invariant()
-    def colors_setting_is_correct(self):
+    def colors_setting_is_correct(self) -> None:
         setting = self.chat.colors_setting()
         # note(f"colors_setting: {setting!r}")
 
@@ -260,7 +275,7 @@ TestChat = ChatRules.TestCase
 PanelSetting = namedtuple("PanelSetting", ["number", "name", "channel_ixs"])
 
 
-def parse_panels(setting):
+def parse_panels(setting: str) -> List[PanelSetting]:
     match = regex.fullmatch(
         r"(?:(?P<number>[0-9]+)\.(?P<name>[^.;]+)\.(?P<channel_bitmask>[0-9]+);)+",
         setting,
@@ -290,7 +305,7 @@ CustomChannelsSetting = namedtuple(
 )
 
 
-def parse_custom_channels(setting):
+def parse_custom_channels(setting: str) -> List[CustomChannelsSetting]:
     match = regex.fullmatch(
         r"(?:(?:\A|;)(?P<name>[^;]+);(?P<password>[^;]*);(?P<number>[0-9]+);(?P<id>[^;]+))*",
         setting,
@@ -308,7 +323,7 @@ def parse_custom_channels(setting):
     return result
 
 
-def parse_colors(setting):
+def parse_colors(setting: str) -> List[Color]:
     match = regex.fullmatch(
         r"(?:(?P<r>[0-9a-fA-F]{2})(?P<g>[0-9a-fA-F]{2})(?P<b>[0-9a-fA-F]{2});){38}",
         setting,

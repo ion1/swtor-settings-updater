@@ -1,4 +1,6 @@
+import pathlib
 import pytest
+from typing import Generator, MutableMapping
 
 from swtor_settings_updater.character import Character
 
@@ -61,14 +63,16 @@ OTHER_FILE_CONTENT = (
 # fmt: on
 
 
-def update_settings(_server_id, _character_name, s):
+def update_settings(
+    _server_id: str, _character_name: str, s: MutableMapping[str, str]
+) -> None:
     s["GUI_QuickslotLockState"] = "true"
     s["GUI_ShowCooldownText"] = "true"
     s["tEST"] = "öä€"
 
 
 @pytest.fixture()
-def settings_dir(tmp_path):
+def settings_dir(tmp_path: pathlib.Path) -> Generator[pathlib.Path, None, None]:
     settings_file_a = tmp_path / SETTINGS_FILENAME_A
     settings_file_b = tmp_path / SETTINGS_FILENAME_B
     other_file = tmp_path / OTHER_FILENAME
@@ -90,22 +94,24 @@ def settings_dir(tmp_path):
     ), "An unrelated file was modified in the settings directory"
 
 
-def test_character_update_path_parses_filename(settings_dir):
+def test_character_update_path_parses_filename(settings_dir: pathlib.Path) -> None:
     settings_filepath = settings_dir / SETTINGS_FILENAME_A
 
     called = [False]
 
-    def check_metadata(server_id, character_name, _s):
+    def check_metadata(
+        server_id: str, character_name: str, _s: MutableMapping[str, str]
+    ) -> None:
         called[0] = True
         assert server_id == "he4242"
         assert character_name == "Kai Zykken"
 
-    Character().update_path(settings_filepath, check_metadata)
+    Character().update_path(str(settings_filepath), check_metadata)
 
     assert called[0]
 
 
-def test_character_update_path_updates_settings(settings_dir):
+def test_character_update_path_updates_settings(settings_dir: pathlib.Path) -> None:
     settings_filepath_a = settings_dir / SETTINGS_FILENAME_A
     settings_filepath_b = settings_dir / SETTINGS_FILENAME_B
 
@@ -121,26 +127,28 @@ def test_character_update_path_updates_settings(settings_dir):
 
 
 def test_character_update_path_does_not_modify_settings_given_invalid_characters(
-    settings_dir,
-):
+    settings_dir: pathlib.Path,
+) -> None:
     """The settings files are encoded in CP1252."""
     settings_filepath = settings_dir / SETTINGS_FILENAME_A
 
-    def update_settings_invalid(_server_id, _character_name, s):
+    def update_settings_invalid(
+        _server_id: str, _character_name: str, s: MutableMapping[str, str]
+    ) -> None:
         s["Invalid"] = "√☃🤦"
 
     with pytest.raises(UnicodeEncodeError):
-        Character().update_path(settings_filepath, update_settings_invalid)
+        Character().update_path(str(settings_filepath), update_settings_invalid)
 
     # The file must be unchanged.
     assert settings_filepath.read_bytes() == SETTINGS_FILE_A_CONTENT_BEFORE
 
 
-def test_character_update_all_updates_settings(settings_dir):
+def test_character_update_all_updates_settings(settings_dir: pathlib.Path) -> None:
     settings_filepath_a = settings_dir / SETTINGS_FILENAME_A
     settings_filepath_b = settings_dir / SETTINGS_FILENAME_B
 
-    Character().update_all(settings_dir, update_settings)
+    Character().update_all(str(settings_dir), update_settings)
 
     assert settings_filepath_a.read_bytes() == SETTINGS_FILE_A_CONTENT_AFTER
     assert settings_filepath_b.read_bytes() == SETTINGS_FILE_B_CONTENT_AFTER

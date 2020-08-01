@@ -1,8 +1,9 @@
+from __future__ import annotations
 from collections import OrderedDict
 import dataclasses as dc
 from itertools import chain, zip_longest
 import regex
-from typing import Set
+from typing import Iterable, Iterator, List, MutableMapping, Optional, Set
 
 from swtor_settings_updater.color import Color
 from swtor_settings_updater.util.character_class import *
@@ -22,7 +23,7 @@ class Channel:
 
 
 @dc.dataclass
-class StandardChannels:
+class StandardChannels(Iterable[Channel]):
     # Global Channels
     trade: Channel = dc.field(
         default_factory=lambda: Channel("Trade", 7, (Color(179, 236, 255)))
@@ -101,14 +102,19 @@ class StandardChannels:
         default_factory=lambda: Channel("Server Admin", 17, (Color(255, 127, 127)))
     )
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Channel]:
         return (getattr(self, f.name) for f in dc.fields(self))
 
 
 class Chat:
     """Manage chat panels, custom channels and colors."""
 
-    def __init__(self):
+    standard_channels: StandardChannels
+    panels: OrderedDict[str, Panel]
+    custom_channel_ixs_available: List[int]
+    custom_channels: OrderedDict[str, CustomChannel]
+
+    def __init__(self) -> None:
         self.standard_channels = StandardChannels()
 
         self.panels = OrderedDict()
@@ -119,7 +125,7 @@ class Chat:
 
         self.custom_channels = OrderedDict()
 
-    def panel(self, name):
+    def panel(self, name: str) -> Panel:
         """Create a chat panel."""
         name_lower = swtor_lower(name)
 
@@ -131,7 +137,9 @@ class Chat:
 
         return t
 
-    def custom_channel(self, name, password=None, id=None):
+    def custom_channel(
+        self, name: str, password: Optional[str] = None, id: Optional[str] = None
+    ) -> CustomChannel:
         """Create a custom chat channel."""
         name_lower = swtor_lower(name)
 
@@ -147,14 +155,16 @@ class Chat:
 
         return cc
 
-    def apply(self, settings):
+    def apply(self, settings: MutableMapping[str, str]) -> None:
         """Apply the chat settings to a configuration object."""
         settings["ChatChannels"] = self.panels_setting()
         settings["Chat_Custom_Channels"] = self.custom_channels_setting()
         settings["ChatColors"] = self.colors_setting()
 
-    def panels_setting(self):
+    def panels_setting(self) -> str:
         """Compute the value for the panels setting (ChatChannels)."""
+
+        panels: Iterable[Panel]
         if self.panels:
             panels = self.panels.values()
         else:
@@ -175,7 +185,7 @@ class Chat:
             channels.append(f"{num}.{panel.name}.{panel.channel_bitmask()};")
         return "".join(channels)
 
-    def undisplayed_channel_ixs(self):
+    def undisplayed_channel_ixs(self) -> Set[int]:
         """Compute the indices of channels not displayed on any panel."""
         ixs = set()
 
@@ -190,7 +200,7 @@ class Chat:
 
         return ixs
 
-    def custom_channels_setting(self):
+    def custom_channels_setting(self) -> str:
         """Compute the value for the Chat_Custom_Channels setting."""
         custom_channels = []
         for num, cc in enumerate(self.custom_channels.values(), start=1):
@@ -198,7 +208,7 @@ class Chat:
             custom_channels.append(f"{cc.name};{password};{num};{cc.id}")
         return ";".join(custom_channels)
 
-    def colors_setting(self):
+    def colors_setting(self) -> str:
         """Compute the value for the ChatColors setting."""
         colors = [DEFAULT_COLOR.copy() for _ in range(MAXIMUM_IX + 1)]
         for c in chain(self.standard_channels, self.custom_channels.values()):
@@ -214,16 +224,16 @@ class Panel:
     # . and ; are separators.
     NAME_REGEX = regex.compile(f'[{regex_character_class(CP1252_PRINTABLE, ".;")}]+')
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not regex.fullmatch(Panel.NAME_REGEX, self.name):
             raise ValueError(f"Invalid name {self.name!r}")
 
-    def display(self, *channels):
+    def display(self, *channels: Channel) -> None:
         """Display the given channel(s) on the panel."""
         for c in channels:
             self.channel_ixs.add(c.ix)
 
-    def channel_bitmask(self):
+    def channel_bitmask(self) -> int:
         bitmask = 0
         for ix in self.channel_ixs:
             bitmask |= 1 << ix
@@ -232,8 +242,8 @@ class Panel:
 
 @dc.dataclass
 class CustomChannel(Channel):
-    password: str = None
-    id: str = None
+    password: Optional[str] = None
+    id: Optional[str] = None
 
     NAME_REGEX = regex.compile(r"[A-Za-z0-9_]+")
     # Spaces are not allowed, ; is a separator, and "&<> seem to be encoded by
@@ -243,7 +253,7 @@ class CustomChannel(Channel):
     )
     ID_REGEX = regex.compile(r"usr\.[a-z0-9_]+")
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not regex.fullmatch(CustomChannel.NAME_REGEX, self.name):
             raise ValueError(f"Invalid name {self.name!r}")
 

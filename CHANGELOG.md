@@ -1,5 +1,9 @@
 # `swtor-settings-updater` Change Log
 
+## Unreleased
+
+* Type check the code with mypy.
+
 ## [v0.0.2](https://github.com/ion1/swtor-settings-updater/releases/tag/v0.0.2) – 2020-07-30
 
 * [README](README.md) updates.
