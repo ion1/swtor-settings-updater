@@ -1,7 +1,6 @@
-import configparser
 import pytest
 
-from swtor_settings_updater.character import Character, OptionTransformer
+from swtor_settings_updater.character import Character
 
 
 SETTINGS_FILENAME_A = "he4242_Kai Zykken_PlayerGUIState.ini"
@@ -90,6 +89,7 @@ def settings_dir(tmp_path):
         other_file.read_bytes() == OTHER_FILE_CONTENT
     ), "An unrelated file was modified in the settings directory"
 
+
 def test_character_update_path_parses_filename(settings_dir):
     settings_filepath = settings_dir / SETTINGS_FILENAME_A
 
@@ -144,35 +144,3 @@ def test_character_update_all_updates_settings(settings_dir):
 
     assert settings_filepath_a.read_bytes() == SETTINGS_FILE_A_CONTENT_AFTER
     assert settings_filepath_b.read_bytes() == SETTINGS_FILE_B_CONTENT_AFTER
-
-
-def test_option_transformer_preserves_case():
-    option_transformer = OptionTransformer()
-
-    parser0 = configparser.ConfigParser()
-    parser0.optionxform = option_transformer.xform
-    parser0["Foo"] = {"hElLo": "there"}
-
-    assert list(parser0["Foo"].keys()) == ["hElLo"]
-
-    parser1 = configparser.ConfigParser()
-    parser1.optionxform = option_transformer.xform
-    parser1["Foo"] = {"HELLO": "bye"}
-
-    assert list(parser1["Foo"].keys()) == ["hElLo"]
-
-
-def test_option_transformer_does_not_preserve_lower_case():
-    option_transformer = OptionTransformer()
-
-    parser0 = configparser.ConfigParser()
-    parser0.optionxform = option_transformer.xform
-    parser0["Foo"] = {"hello": "there"}
-
-    assert list(parser0["Foo"].keys()) == ["hello"]
-
-    parser1 = configparser.ConfigParser()
-    parser1.optionxform = option_transformer.xform
-    parser1["Foo"] = {"hElLo": "bye"}
-
-    assert list(parser1["Foo"].keys()) == ["hElLo"]

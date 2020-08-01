@@ -6,6 +6,8 @@ import os
 import os.path
 import re
 
+from swtor_settings_updater.util.option_transformer import OptionTransformer
+
 
 SETTINGS_DIR = "%LOCALAPPDATA%/SWTOR/swtor/settings"
 
@@ -51,26 +53,3 @@ class Character:
         parser = configparser.ConfigParser(interpolation=None)
         parser.optionxform = self.option_transformer.xform
         return parser
-
-
-class OptionTransformer:
-    """Prevent ConfigParser from lower-casing key names."""
-
-    def __init__(self):
-        self.canonical_forms = {}
-
-    def xform(self, name):
-        name_lower = name.lower()
-
-        if name_lower in self.canonical_forms:
-            return self.canonical_forms[name_lower]
-
-        elif name == name_lower:
-            # A lower-case name, possibly mangled by ConfigParser previously. Do not
-            # add it to the dict.
-            return name
-
-        else:
-            # Add the name to the dict as the canonical form.
-            self.canonical_forms[name_lower] = name
-            return name
