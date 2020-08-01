@@ -1,6 +1,7 @@
 import pathlib
-import pytest
 from typing import Generator, MutableMapping
+
+import pytest
 
 from swtor_settings_updater.character import Character
 
@@ -85,9 +86,11 @@ def settings_dir(tmp_path: pathlib.Path) -> Generator[pathlib.Path, None, None]:
 
     # The code should not leave extra files behind (or delete existing files
     # for that matter).
-    assert set(map(lambda p: p.name, tmp_path.iterdir())) == set(
-        [SETTINGS_FILENAME_A, SETTINGS_FILENAME_B, OTHER_FILENAME]
-    ), "A file was added or removed in the settings directory"
+    assert set(map(lambda p: p.name, tmp_path.iterdir())) == {
+        SETTINGS_FILENAME_A,
+        SETTINGS_FILENAME_B,
+        OTHER_FILENAME,
+    }, "A file was added or removed in the settings directory"
 
     assert (
         other_file.read_bytes() == OTHER_FILE_CONTENT

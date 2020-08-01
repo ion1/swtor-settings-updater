@@ -1,4 +1,3 @@
-from atomicwrites import atomic_write
 import configparser
 import glob
 import logging
@@ -6,6 +5,8 @@ import os
 import os.path
 import re
 from typing import Callable, MutableMapping
+
+from atomicwrites import atomic_write
 
 from swtor_settings_updater.util.option_transformer import OptionTransformer
 

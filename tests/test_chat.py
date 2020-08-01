@@ -1,24 +1,30 @@
 from __future__ import annotations
-from collections import OrderedDict, namedtuple
-from hypothesis import given, assume, note
+
+from collections import namedtuple, OrderedDict
+from typing import Any, Iterable, List, Optional
+
+from hypothesis import assume
 import hypothesis.stateful as sta
 import hypothesis.strategies as st
 import pytest
 import regex
-from typing import Any, Iterable, List, Optional
 
-from swtor_settings_updater.chat import *
+from swtor_settings_updater.chat import Channel, Chat, CustomChannel, Panel
 from swtor_settings_updater.color import Color
-from swtor_settings_updater.util.swtor_case import *
-
-from test_color import valid_rgb
+from swtor_settings_updater.util.swtor_case import swtor_lower, swtor_upper
+from .test_color import valid_rgb
 
 
 valid_color = valid_rgb().map(lambda rgb: Color(*rgb))
 
 # See chat_channels.txt
-all_channel_ixs = set(range(37 + 1)) - set([4, 5, 14, 16, 21, 30, 31, 32])
-default_colors = "b3ecff;ff7397;ff8022;a59ff3;eeee00;eeee00;b3ecff;b3ecff;b3ecff;1d8cfe;82ec89;ff00ff;efbc55;317a3c;eeee00;ff0000;eeee00;ff7f7f;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;ff5400;eeee00;eeee00;eeee00;a00000;c92e56;bb4fd2;1fab29;ff6600;"
+all_channel_ixs = set(range(37 + 1)) - {4, 5, 14, 16, 21, 30, 31, 32}
+default_colors = (
+    "b3ecff;ff7397;ff8022;a59ff3;eeee00;eeee00;b3ecff;b3ecff;b3ecff;1d8cfe;"
+    "82ec89;ff00ff;efbc55;317a3c;eeee00;ff0000;eeee00;ff7f7f;eeee00;eeee00;"
+    "eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;ff5400;"
+    "eeee00;eeee00;eeee00;a00000;c92e56;bb4fd2;1fab29;ff6600;"
+)
 num_custom_channels = 7
 
 valid_panel_name = st.from_regex(Panel.NAME_REGEX, fullmatch=True)
@@ -188,9 +194,12 @@ class ChatRules(sta.RuleBasedStateMachine):
         settings = {"foo": "bar"}
         self.chat.apply(settings)
 
-        assert set(settings.keys()) == set(
-            ["foo", "ChatChannels", "Chat_Custom_Channels", "ChatColors"]
-        )
+        assert set(settings.keys()) == {
+            "foo",
+            "ChatChannels",
+            "Chat_Custom_Channels",
+            "ChatColors",
+        }
 
         parse_panels(settings["ChatChannels"])
         parse_custom_channels(settings["Chat_Custom_Channels"])
@@ -277,8 +286,15 @@ PanelSetting = namedtuple("PanelSetting", ["number", "name", "channel_ixs"])
 
 def parse_panels(setting: str) -> List[PanelSetting]:
     match = regex.fullmatch(
-        r"(?:(?P<number>[0-9]+)\.(?P<name>[^.;]+)\.(?P<channel_bitmask>[0-9]+);)+",
+        r"""
+            (?:
+                (?P<number>[0-9]+)\.
+                (?P<name>[^.;]+)\.
+                (?P<channel_bitmask>[0-9]+);
+            )+
+        """,
         setting,
+        regex.VERBOSE,
     )
     if match is None:
         raise ValueError(f"Failed to parse ChatChannels: {setting!r}")
@@ -307,8 +323,16 @@ CustomChannelsSetting = namedtuple(
 
 def parse_custom_channels(setting: str) -> List[CustomChannelsSetting]:
     match = regex.fullmatch(
-        r"(?:(?:\A|;)(?P<name>[^;]+);(?P<password>[^;]*);(?P<number>[0-9]+);(?P<id>[^;]+))*",
+        r"""
+            (?:
+                (?:\A|;)(?P<name>[^;]+)
+                ;(?P<password>[^;]*)
+                ;(?P<number>[0-9]+)
+                ;(?P<id>[^;]+)
+            )*
+        """,
         setting,
+        regex.VERBOSE,
     )
     if match is None:
         raise ValueError(f"Failed to parse Chat_Custom_Channels: {setting!r}")
@@ -325,8 +349,15 @@ def parse_custom_channels(setting: str) -> List[CustomChannelsSetting]:
 
 def parse_colors(setting: str) -> List[Color]:
     match = regex.fullmatch(
-        r"(?:(?P<r>[0-9a-fA-F]{2})(?P<g>[0-9a-fA-F]{2})(?P<b>[0-9a-fA-F]{2});){38}",
+        r"""
+            (?:
+                (?P<r>[0-9a-fA-F]{2})
+                (?P<g>[0-9a-fA-F]{2})
+                (?P<b>[0-9a-fA-F]{2});
+            ){38}
+        """,
         setting,
+        regex.VERBOSE,
     )
     if match is None:
         raise ValueError(f"Failed to parse ChatColors: {setting!r}")

@@ -1,13 +1,19 @@
 from __future__ import annotations
+
 from collections import OrderedDict
 import dataclasses as dc
 from itertools import chain, zip_longest
-import regex
 from typing import Iterable, Iterator, List, MutableMapping, Optional, Set
 
+import regex
+
 from swtor_settings_updater.color import Color
-from swtor_settings_updater.util.character_class import *
-from swtor_settings_updater.util.swtor_case import *
+from swtor_settings_updater.util.character_class import (
+    CP1252_PRINTABLE,
+    regex_character_class,
+)
+from swtor_settings_updater.util.swtor_case import swtor_lower
+
 
 CUSTOM_CHANNEL_IXS = range(22, 28 + 1)
 MAXIMUM_IX = 37
@@ -163,7 +169,6 @@ class Chat:
 
     def panels_setting(self) -> str:
         """Compute the value for the panels setting (ChatChannels)."""
-
         panels: Iterable[Panel]
         if self.panels:
             panels = self.panels.values()

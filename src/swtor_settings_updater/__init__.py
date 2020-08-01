@@ -1,5 +1,7 @@
-from swtor_settings_updater.character import Character, SETTINGS_DIR
-from swtor_settings_updater.chat import Chat
-from swtor_settings_updater.color import Color
+from .character import Character, SETTINGS_DIR
+from .chat import Chat
+from .color import Color
 
 __version__ = "0.0.2"
+
+__all__ = ["Character", "SETTINGS_DIR", "Chat", "Color"]
