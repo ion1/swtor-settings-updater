@@ -6,9 +6,9 @@ import pytest
 from swtor_settings_updater.character import Character, CharacterMetadata
 
 
-SETTINGS_FILENAME_A = "he4242_Kai Zykken_PlayerGUIState.ini"
-SETTINGS_FILENAME_B = "he4343_Plagueis_PlayerGUIState.ini"
-OTHER_FILENAME = "Irrelevant.ini"
+SETTINGS_PATH_A = Path("swtor/settings/he4242_Kai Zykken_PlayerGUIState.ini")
+SETTINGS_PATH_B = Path("publictest/settings/he4343_Plagueis_PlayerGUIState.ini")
+OTHER_PATH = Path("swtor/settings/Other.ini")
 
 # fmt: off
 
@@ -76,23 +76,32 @@ def update_settings(_character: CharacterMetadata, s: MutableMapping[str, str]) 
 
 @pytest.fixture()
 def settings_dir(tmp_path: Path) -> Generator[Path, None, None]:
-    settings_file_a = tmp_path / SETTINGS_FILENAME_A
-    settings_file_b = tmp_path / SETTINGS_FILENAME_B
-    other_file = tmp_path / OTHER_FILENAME
+    expected_paths = set()
+
+    for environment in [tmp_path / "swtor", tmp_path / "publictest"]:
+        for d in [environment, environment / "settings"]:
+            d.mkdir()
+            expected_paths.add(d)
+
+    settings_file_a = tmp_path / SETTINGS_PATH_A
+    settings_file_b = tmp_path / SETTINGS_PATH_B
+    other_file = tmp_path / OTHER_PATH
 
     settings_file_a.write_bytes(SETTINGS_FILE_A_CONTENT_BEFORE)
     settings_file_b.write_bytes(SETTINGS_FILE_B_CONTENT_BEFORE)
     other_file.write_bytes(OTHER_FILE_CONTENT)
 
+    expected_paths.add(settings_file_a)
+    expected_paths.add(settings_file_b)
+    expected_paths.add(other_file)
+
     yield tmp_path
 
     # The code should not leave extra files behind (or delete existing files
     # for that matter).
-    assert set(map(lambda p: p.name, tmp_path.iterdir())) == {
-        SETTINGS_FILENAME_A,
-        SETTINGS_FILENAME_B,
-        OTHER_FILENAME,
-    }, "A file was added or removed in the settings directory"
+    assert (
+        set(tmp_path.rglob("*")) == expected_paths
+    ), "A file was added or removed in the settings directory"
 
     assert (
         other_file.read_bytes() == OTHER_FILE_CONTENT
@@ -103,7 +112,7 @@ def settings_dir(tmp_path: Path) -> Generator[Path, None, None]:
 def test_character_update_path_parses_filename(
     path_fun: PathFunction, settings_dir: Path
 ) -> None:
-    settings_filepath = settings_dir / SETTINGS_FILENAME_A
+    settings_filepath = settings_dir / SETTINGS_PATH_A
 
     called = [False]
 
@@ -111,6 +120,7 @@ def test_character_update_path_parses_filename(
         character: CharacterMetadata, _s: MutableMapping[str, str]
     ) -> None:
         called[0] = True
+        assert character.environment == "swtor"
         assert character.server_id == "he4242"
         assert character.name == "Kai Zykken"
 
@@ -123,8 +133,8 @@ def test_character_update_path_parses_filename(
 def test_character_update_path_updates_settings(
     path_fun: PathFunction, settings_dir: Path
 ) -> None:
-    settings_filepath_a = settings_dir / SETTINGS_FILENAME_A
-    settings_filepath_b = settings_dir / SETTINGS_FILENAME_B
+    settings_filepath_a = settings_dir / SETTINGS_PATH_A
+    settings_filepath_b = settings_dir / SETTINGS_PATH_B
 
     Character().update_path(path_fun(settings_filepath_a), update_settings)
 
@@ -142,7 +152,7 @@ def test_character_update_path_does_not_modify_settings_given_invalid_characters
     path_fun: PathFunction, settings_dir: Path,
 ) -> None:
     """The settings files are encoded in CP1252."""
-    settings_filepath = settings_dir / SETTINGS_FILENAME_A
+    settings_filepath = settings_dir / SETTINGS_PATH_A
 
     def update_settings_invalid(
         _character: CharacterMetadata, s: MutableMapping[str, str]
@@ -160,8 +170,8 @@ def test_character_update_path_does_not_modify_settings_given_invalid_characters
 def test_character_update_all_updates_settings(
     path_fun: PathFunction, settings_dir: Path
 ) -> None:
-    settings_filepath_a = settings_dir / SETTINGS_FILENAME_A
-    settings_filepath_b = settings_dir / SETTINGS_FILENAME_B
+    settings_filepath_a = settings_dir / SETTINGS_PATH_A
+    settings_filepath_b = settings_dir / SETTINGS_PATH_B
 
     Character().update_all(path_fun(settings_dir), update_settings)
 
