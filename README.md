@@ -12,10 +12,10 @@ A library to update the `*_PlayerGUIState.ini` settings for all your characters.
 
 ```python
 import logging
-from swtor_settings_updater import *
+from swtor_settings_updater import Character, Chat, SETTINGS_DIR
 
 
-def my_settings(server_id, character_name, s):
+def my_settings(character, s):
     # swtor_settings_updater.Chat sets the ChatChannels, Chat_Custom_Channels
     # and ChatColors settings.
     chat = Chat()
@@ -54,10 +54,10 @@ def my_settings(server_id, character_name, s):
         # chn.server_admin,
     )
 
-    if character_name not in ["Kai Zykken", "Plagueis"]:
+    if character.name not in ["Kai Zykken", "Plagueis"]:
         chat.custom_channel("Gsf")
 
-        if server_id == "he4000":
+        if character.server_id == "he4000":
             chat.custom_channel("Redleader")
             chat.custom_channel("Narwhal")
 
@@ -65,7 +65,7 @@ def my_settings(server_id, character_name, s):
             myguild.color = chn.guild.color
             other.display(myguild)
 
-        elif server_id in ["he3000", "he3001"]:
+        elif character.server_id in ["he3000", "he3001"]:
             chat.custom_channel("Endgame")
 
     chat.apply(s)

@@ -1,4 +1,5 @@
 import configparser
+import dataclasses as dc
 import glob
 import logging
 import os
@@ -11,9 +12,17 @@ from atomicwrites import atomic_write
 from swtor_settings_updater.util.option_transformer import OptionTransformer
 
 
-UpdateCallback = Callable[[str, str, MutableMapping[str, str]], None]
-
 SETTINGS_DIR = "%LOCALAPPDATA%/SWTOR/swtor/settings"
+
+
+@dc.dataclass
+class CharacterMetadata:
+    __slots__ = ["server_id", "name"]
+    server_id: str
+    name: str
+
+
+UpdateCallback = Callable[[CharacterMetadata, MutableMapping[str, str]], None]
 
 
 class Character:
@@ -43,15 +52,16 @@ class Character:
         if not match:
             raise ValueError(f"Unrecognized filename: {filename!r}")
 
-        server_id = match.group("server_id")
-        character_name = match.group("character_name")
+        metadata = CharacterMetadata(
+            server_id=match.group("server_id"), name=match.group("character_name"),
+        )
 
-        self.logger.info(f"Updating {server_id} {character_name}")
+        self.logger.info(f"Updating {metadata.server_id} {metadata.name}")
 
         parser = self._config_parser()
         parser.read(path, encoding="CP1252")
 
-        callback(server_id, character_name, parser["Settings"])
+        callback(metadata, parser["Settings"])
 
         with atomic_write(path, encoding="CP1252", newline="\r\n", overwrite=True) as f:
             parser.write(f)

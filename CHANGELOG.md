@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Pass the character metadata to the update callback as a data class object.
 * Type check the code with mypy.
 * Lint the code with flake8.
 

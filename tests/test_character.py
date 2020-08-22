@@ -3,7 +3,7 @@ from typing import Generator, MutableMapping
 
 import pytest
 
-from swtor_settings_updater.character import Character
+from swtor_settings_updater.character import Character, CharacterMetadata
 
 
 SETTINGS_FILENAME_A = "he4242_Kai Zykken_PlayerGUIState.ini"
@@ -64,9 +64,7 @@ OTHER_FILE_CONTENT = (
 # fmt: on
 
 
-def update_settings(
-    _server_id: str, _character_name: str, s: MutableMapping[str, str]
-) -> None:
+def update_settings(_character: CharacterMetadata, s: MutableMapping[str, str]) -> None:
     s["GUI_QuickslotLockState"] = "true"
     s["GUI_ShowCooldownText"] = "true"
     s["tEST"] = "öä€"
@@ -103,11 +101,11 @@ def test_character_update_path_parses_filename(settings_dir: pathlib.Path) -> No
     called = [False]
 
     def check_metadata(
-        server_id: str, character_name: str, _s: MutableMapping[str, str]
+        character: CharacterMetadata, _s: MutableMapping[str, str]
     ) -> None:
         called[0] = True
-        assert server_id == "he4242"
-        assert character_name == "Kai Zykken"
+        assert character.server_id == "he4242"
+        assert character.name == "Kai Zykken"
 
     Character().update_path(str(settings_filepath), check_metadata)
 
@@ -136,7 +134,7 @@ def test_character_update_path_does_not_modify_settings_given_invalid_characters
     settings_filepath = settings_dir / SETTINGS_FILENAME_A
 
     def update_settings_invalid(
-        _server_id: str, _character_name: str, s: MutableMapping[str, str]
+        _character: CharacterMetadata, s: MutableMapping[str, str]
     ) -> None:
         s["Invalid"] = "√☃🤦"
 
