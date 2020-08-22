@@ -130,6 +130,23 @@ def test_character_update_path_parses_filename(
 
 
 @pytest.mark.parametrize("path_fun", [str, Path])
+def test_character_update_path_fails_to_parse_incorrect_filename(
+    path_fun: PathFunction, settings_dir: Path
+) -> None:
+    other_filepath = settings_dir / OTHER_PATH
+
+    called = [False]
+
+    def callback(character: CharacterMetadata, _s: MutableMapping[str, str]) -> None:
+        called[0] = True
+
+    with pytest.raises(ValueError):
+        Character().update_path(path_fun(other_filepath), callback)
+
+    assert not called[0]
+
+
+@pytest.mark.parametrize("path_fun", [str, Path])
 def test_character_update_path_updates_settings(
     path_fun: PathFunction, settings_dir: Path
 ) -> None:
