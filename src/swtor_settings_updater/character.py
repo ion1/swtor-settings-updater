@@ -28,12 +28,9 @@ def default_settings_dir() -> Path:
 
 class Character:
     logger: logging.Logger
-    option_transformer: OptionTransformer
 
     def __init__(self) -> None:
         self.logger = logging.getLogger(__name__)
-
-        self.option_transformer = OptionTransformer()
 
     def update_all(
         self, settings_dir: Union[str, os.PathLike], callback: UpdateCallback
@@ -81,5 +78,5 @@ class Character:
 
     def _config_parser(self) -> configparser.ConfigParser:
         parser = configparser.ConfigParser(interpolation=None)
-        self.option_transformer.install(parser)
+        OptionTransformer().install(parser)
         return parser
