@@ -22,10 +22,6 @@ class CharacterMetadata:
 UpdateCallback = Callable[[CharacterMetadata, MutableMapping[str, str]], None]
 
 
-def default_settings_dir() -> Path:
-    return Path(os.environ["LOCALAPPDATA"]) / "SWTOR"
-
-
 logger = logging.getLogger(__name__)
 
 
