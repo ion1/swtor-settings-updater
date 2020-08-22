@@ -1,18 +1,14 @@
 import configparser
 import dataclasses as dc
-import glob
 import logging
 import os
-import os.path
+from pathlib import Path
 import re
-from typing import Callable, MutableMapping
+from typing import Callable, MutableMapping, Union
 
 from atomicwrites import atomic_write
 
 from swtor_settings_updater.util.option_transformer import OptionTransformer
-
-
-SETTINGS_DIR = "%LOCALAPPDATA%/SWTOR/swtor/settings"
 
 
 @dc.dataclass
@@ -25,6 +21,10 @@ class CharacterMetadata:
 UpdateCallback = Callable[[CharacterMetadata, MutableMapping[str, str]], None]
 
 
+def default_settings_dir() -> Path:
+    return Path(os.environ["LOCALAPPDATA"]) / "SWTOR" / "swtor" / "settings"
+
+
 class Character:
     logger: logging.Logger
     option_transformer: OptionTransformer
@@ -34,23 +34,25 @@ class Character:
 
         self.option_transformer = OptionTransformer()
 
-    def update_all(self, settings_dir: str, callback: UpdateCallback) -> None:
-        settings_pattern = os.path.join(
-            os.path.expandvars(settings_dir), "he*_PlayerGUIState.ini"
-        )
+    def update_all(
+        self, settings_dir: Union[str, os.PathLike], callback: UpdateCallback
+    ) -> None:
+        settings_dir = Path(settings_dir)
 
-        for path in glob.iglob(settings_pattern):
+        for path in settings_dir.glob("he*_*_PlayerGUIState.ini"):
             self.update_path(path, callback)
 
-    def update_path(self, path: str, callback: UpdateCallback) -> None:
-        filename = os.path.basename(path)
+    def update_path(
+        self, path: Union[str, os.PathLike], callback: UpdateCallback
+    ) -> None:
+        path = Path(path)
 
         match = re.fullmatch(
             r"(?P<server_id>he[^_]+)_(?P<character_name>[^_]+)_PlayerGUIState.ini",
-            filename,
+            path.name,
         )
         if not match:
-            raise ValueError(f"Unrecognized filename: {filename!r}")
+            raise ValueError(f"Unrecognized filename: {path!r}")
 
         metadata = CharacterMetadata(
             server_id=match.group("server_id"), name=match.group("character_name"),

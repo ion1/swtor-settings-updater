@@ -1,5 +1,5 @@
-import pathlib
-from typing import Generator, MutableMapping
+from pathlib import Path
+from typing import Callable, Generator, MutableMapping, Union
 
 import pytest
 
@@ -64,6 +64,10 @@ OTHER_FILE_CONTENT = (
 # fmt: on
 
 
+# For testing both str and Path inputs.
+PathFunction = Callable[[Union[str, Path]], Union[str, Path]]
+
+
 def update_settings(_character: CharacterMetadata, s: MutableMapping[str, str]) -> None:
     s["GUI_QuickslotLockState"] = "true"
     s["GUI_ShowCooldownText"] = "true"
@@ -71,7 +75,7 @@ def update_settings(_character: CharacterMetadata, s: MutableMapping[str, str]) 
 
 
 @pytest.fixture()
-def settings_dir(tmp_path: pathlib.Path) -> Generator[pathlib.Path, None, None]:
+def settings_dir(tmp_path: Path) -> Generator[Path, None, None]:
     settings_file_a = tmp_path / SETTINGS_FILENAME_A
     settings_file_b = tmp_path / SETTINGS_FILENAME_B
     other_file = tmp_path / OTHER_FILENAME
@@ -95,7 +99,10 @@ def settings_dir(tmp_path: pathlib.Path) -> Generator[pathlib.Path, None, None]:
     ), "An unrelated file was modified in the settings directory"
 
 
-def test_character_update_path_parses_filename(settings_dir: pathlib.Path) -> None:
+@pytest.mark.parametrize("path_fun", [str, Path])
+def test_character_update_path_parses_filename(
+    path_fun: PathFunction, settings_dir: Path
+) -> None:
     settings_filepath = settings_dir / SETTINGS_FILENAME_A
 
     called = [False]
@@ -107,16 +114,19 @@ def test_character_update_path_parses_filename(settings_dir: pathlib.Path) -> No
         assert character.server_id == "he4242"
         assert character.name == "Kai Zykken"
 
-    Character().update_path(str(settings_filepath), check_metadata)
+    Character().update_path(path_fun(settings_filepath), check_metadata)
 
     assert called[0]
 
 
-def test_character_update_path_updates_settings(settings_dir: pathlib.Path) -> None:
+@pytest.mark.parametrize("path_fun", [str, Path])
+def test_character_update_path_updates_settings(
+    path_fun: PathFunction, settings_dir: Path
+) -> None:
     settings_filepath_a = settings_dir / SETTINGS_FILENAME_A
     settings_filepath_b = settings_dir / SETTINGS_FILENAME_B
 
-    Character().update_path(str(settings_filepath_a), update_settings)
+    Character().update_path(path_fun(settings_filepath_a), update_settings)
 
     assert (
         settings_filepath_a.read_bytes() == SETTINGS_FILE_A_CONTENT_AFTER
@@ -127,8 +137,9 @@ def test_character_update_path_updates_settings(settings_dir: pathlib.Path) -> N
     ), "Another settings file was modified unexpectedly"
 
 
+@pytest.mark.parametrize("path_fun", [str, Path])
 def test_character_update_path_does_not_modify_settings_given_invalid_characters(
-    settings_dir: pathlib.Path,
+    path_fun: PathFunction, settings_dir: Path,
 ) -> None:
     """The settings files are encoded in CP1252."""
     settings_filepath = settings_dir / SETTINGS_FILENAME_A
@@ -139,17 +150,20 @@ def test_character_update_path_does_not_modify_settings_given_invalid_characters
         s["Invalid"] = "√☃🤦"
 
     with pytest.raises(UnicodeEncodeError):
-        Character().update_path(str(settings_filepath), update_settings_invalid)
+        Character().update_path(path_fun(settings_filepath), update_settings_invalid)
 
     # The file must be unchanged.
     assert settings_filepath.read_bytes() == SETTINGS_FILE_A_CONTENT_BEFORE
 
 
-def test_character_update_all_updates_settings(settings_dir: pathlib.Path) -> None:
+@pytest.mark.parametrize("path_fun", [str, Path])
+def test_character_update_all_updates_settings(
+    path_fun: PathFunction, settings_dir: Path
+) -> None:
     settings_filepath_a = settings_dir / SETTINGS_FILENAME_A
     settings_filepath_b = settings_dir / SETTINGS_FILENAME_B
 
-    Character().update_all(str(settings_dir), update_settings)
+    Character().update_all(path_fun(settings_dir), update_settings)
 
     assert settings_filepath_a.read_bytes() == SETTINGS_FILE_A_CONTENT_AFTER
     assert settings_filepath_b.read_bytes() == SETTINGS_FILE_B_CONTENT_AFTER
