@@ -12,7 +12,7 @@ A library to update the `*_PlayerGUIState.ini` settings for all your characters.
 
 ```python
 import logging
-from swtor_settings_updater import Character, Chat, default_settings_dir
+from swtor_settings_updater import character, Chat, default_settings_dir
 
 
 def my_settings(character, s):
@@ -94,5 +94,5 @@ def my_settings(character, s):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    Character().update_all(default_settings_dir(), my_settings)
+    character.update_all(default_settings_dir(), my_settings)
 ```

@@ -3,7 +3,7 @@ from typing import Callable, Generator, MutableMapping, Union
 
 import pytest
 
-from swtor_settings_updater.character import Character, CharacterMetadata
+from swtor_settings_updater.character import CharacterMetadata, update_all, update_path
 
 
 SETTINGS_PATH_A = Path("swtor/settings/he4242_Kai Zykken_PlayerGUIState.ini")
@@ -124,7 +124,7 @@ def test_character_update_path_parses_filename(
         assert character.server_id == "he4242"
         assert character.name == "Kai Zykken"
 
-    Character().update_path(path_fun(settings_filepath), check_metadata)
+    update_path(path_fun(settings_filepath), check_metadata)
 
     assert called[0]
 
@@ -141,7 +141,7 @@ def test_character_update_path_fails_to_parse_incorrect_filename(
         called[0] = True
 
     with pytest.raises(ValueError):
-        Character().update_path(path_fun(other_filepath), callback)
+        update_path(path_fun(other_filepath), callback)
 
     assert not called[0]
 
@@ -153,7 +153,7 @@ def test_character_update_path_updates_settings(
     settings_filepath_a = settings_dir / SETTINGS_PATH_A
     settings_filepath_b = settings_dir / SETTINGS_PATH_B
 
-    Character().update_path(path_fun(settings_filepath_a), update_settings)
+    update_path(path_fun(settings_filepath_a), update_settings)
 
     assert (
         settings_filepath_a.read_bytes() == SETTINGS_FILE_A_CONTENT_AFTER
@@ -177,7 +177,7 @@ def test_character_update_path_does_not_modify_settings_given_invalid_characters
         s["Invalid"] = "√☃🤦"
 
     with pytest.raises(UnicodeEncodeError):
-        Character().update_path(path_fun(settings_filepath), update_settings_invalid)
+        update_path(path_fun(settings_filepath), update_settings_invalid)
 
     # The file must be unchanged.
     assert settings_filepath.read_bytes() == SETTINGS_FILE_A_CONTENT_BEFORE
@@ -190,7 +190,7 @@ def test_character_update_all_updates_settings(
     settings_filepath_a = settings_dir / SETTINGS_PATH_A
     settings_filepath_b = settings_dir / SETTINGS_PATH_B
 
-    Character().update_all(path_fun(settings_dir), update_settings)
+    update_all(path_fun(settings_dir), update_settings)
 
     assert settings_filepath_a.read_bytes() == SETTINGS_FILE_A_CONTENT_AFTER
     assert settings_filepath_b.read_bytes() == SETTINGS_FILE_B_CONTENT_AFTER

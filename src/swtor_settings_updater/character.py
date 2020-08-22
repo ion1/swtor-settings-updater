@@ -26,57 +26,46 @@ def default_settings_dir() -> Path:
     return Path(os.environ["LOCALAPPDATA"]) / "SWTOR"
 
 
-class Character:
-    logger: logging.Logger
+logger = logging.getLogger(__name__)
 
-    def __init__(self) -> None:
-        self.logger = logging.getLogger(__name__)
 
-    def update_all(
-        self, settings_dir: Union[str, os.PathLike], callback: UpdateCallback
-    ) -> None:
-        settings_dir = Path(settings_dir)
+def update_all(settings_dir: Union[str, os.PathLike], callback: UpdateCallback) -> None:
+    settings_dir = Path(settings_dir)
 
-        for path in settings_dir.glob("*/settings/he*_*_PlayerGUIState.ini"):
-            self.update_path(path, callback)
+    for path in settings_dir.glob("*/settings/he*_*_PlayerGUIState.ini"):
+        update_path(path, callback)
 
-    def update_path(
-        self, path: Union[str, os.PathLike], callback: UpdateCallback
-    ) -> None:
-        path = Path(path)
 
-        # Examples:
-        # .../SWTOR/swtor/settings/he4242_Kai Zykken_PlayerGUIState.ini
-        # .../SWTOR/publictest/settings/he4343_Plagueis_PlayerGUIState.ini
+def update_path(path: Union[str, os.PathLike], callback: UpdateCallback) -> None:
+    path = Path(path)
 
-        environment = path.parent.parent.name
+    # Examples:
+    # .../SWTOR/swtor/settings/he4242_Kai Zykken_PlayerGUIState.ini
+    # .../SWTOR/publictest/settings/he4343_Plagueis_PlayerGUIState.ini
 
-        match = re.fullmatch(
-            r"(?P<server_id>he[^_]+)_(?P<character_name>[^_]+)_PlayerGUIState.ini",
-            path.name,
-        )
-        if not match:
-            raise ValueError(f"Unrecognized filename: {path!r}")
+    environment = path.parent.parent.name
 
-        metadata = CharacterMetadata(
-            environment=environment,
-            server_id=match.group("server_id"),
-            name=match.group("character_name"),
-        )
+    match = re.fullmatch(
+        r"(?P<server_id>he[^_]+)_(?P<character_name>[^_]+)_PlayerGUIState.ini",
+        path.name,
+    )
+    if not match:
+        raise ValueError(f"Unrecognized filename: {path!r}")
 
-        self.logger.info(
-            f"Updating {metadata.environment} {metadata.server_id} {metadata.name}"
-        )
+    metadata = CharacterMetadata(
+        environment=environment,
+        server_id=match.group("server_id"),
+        name=match.group("character_name"),
+    )
 
-        parser = self._config_parser()
-        parser.read(path, encoding="CP1252")
+    logger.info(f"Updating {metadata.environment} {metadata.server_id} {metadata.name}")
 
-        callback(metadata, parser["Settings"])
+    parser = configparser.ConfigParser(interpolation=None)
+    OptionTransformer().install(parser)
 
-        with atomic_write(path, encoding="CP1252", newline="\r\n", overwrite=True) as f:
-            parser.write(f)
+    parser.read(path, encoding="CP1252")
 
-    def _config_parser(self) -> configparser.ConfigParser:
-        parser = configparser.ConfigParser(interpolation=None)
-        OptionTransformer().install(parser)
-        return parser
+    callback(metadata, parser["Settings"])
+
+    with atomic_write(path, encoding="CP1252", newline="\r\n", overwrite=True) as f:
+        parser.write(f)

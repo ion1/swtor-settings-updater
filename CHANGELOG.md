@@ -1,5 +1,9 @@
 # `swtor-settings-updater` Change Log
 
+## Unreleased
+
+* `Character` no longer needs to be a class. Change the methods to functions.
+
 ## [v0.0.3](https://github.com/ion1/swtor-settings-updater/releases/tag/v0.0.3) – 2020-08-22
 
 * Pass the character metadata to the update callback as a data class object.
