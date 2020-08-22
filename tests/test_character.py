@@ -23,7 +23,7 @@ SETTINGS_FILE_A_CONTENT_AFTER = (
     b"Show_Chat_Timestamp = false\r\n"
     b"Test = \xf6\xe4\x80\r\n"
     b"GUI_QuickslotLockState = true\r\n"
-    b"GUI_ShowCooldownText = true\r\n"
+    b"gui_showcooldowntext = true\r\n"
     b"\r\n"
 )
 
@@ -33,7 +33,7 @@ SETTINGS_FILE_B_CONTENT_BEFORE = (
     b"\r\n"
     b"[Settings]\r\n"
     b"\r\n"
-    b"gui_showcooldowntext = false\r\n"
+    b"GUI_ShowCooldownText = false\r\n"
     b"\r\n"
     b"Test = \x80\xe4\xf6\r\n"
     b"\r\n"
@@ -70,7 +70,7 @@ PathFunction = Callable[[Union[str, Path]], Union[str, Path]]
 
 def update_settings(_character: CharacterMetadata, s: MutableMapping[str, str]) -> None:
     s["GUI_QuickslotLockState"] = "true"
-    s["GUI_ShowCooldownText"] = "true"
+    s["gui_showcooldowntext"] = "true"
     s["tEST"] = "öä€"
 
 
