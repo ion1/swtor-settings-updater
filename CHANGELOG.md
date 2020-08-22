@@ -1,6 +1,6 @@
 # `swtor-settings-updater` Change Log
 
-## Unreleased
+## [v0.0.3](https://github.com/ion1/swtor-settings-updater/releases/tag/v0.0.3) – 2020-08-22
 
 * Pass the character metadata to the update callback as a data class object.
 * Support multiple environments (both live and PTS).
