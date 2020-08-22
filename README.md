@@ -16,6 +16,27 @@ from swtor_settings_updater import character, Chat, default_settings_dir
 
 
 def my_settings(character, s):
+    s["Show_Chat_TimeStamp"] = "true"
+    s["GUI_Current_Profile"] = "myprofile"
+    s["GUI_WelcomeWindowIsOpen"] = "false"
+    s["GUI_ShowCompletedReputations"] = "false"
+    s["GUI_ShowUnstartedReputations"] = "false"
+    s["GUI_ShowAlignment"] = "true"
+    s["GUI_InvitesAsSocialMessage"] = "true"
+    s["GUI_ShowCooldownText"] = "true"
+    s["GUI_CooldownStyle"] = "3"
+    s["GUI_GCDStyle"] = "1"
+    s["GUI_MiniMapZoom"] = "0.842999994755"
+    s["GUI_MapFadeTo"] = "50.0"
+    s["GUI_GCConfirmOpenPack"] = "false"
+    s["GUI_ConfirmAmplifierCharge"] = "false"
+    s["GUI_InventoryAutoCloseBank"] = "false"
+    s["GUI_InventoryAutoCloseVendor"] = "false"
+    s["GUI_QuickslotLockState"] = "true"
+    s["GUI_WhoListNumberInChat"] = "0"
+    s["GroupFinder_Operation_InProgress"] = "true"
+    s["GUI_CraftingMoveQuality"] = "6"
+
     # swtor_settings_updater.Chat sets the ChatChannels, Chat_Custom_Channels
     # and ChatColors settings.
     chat = Chat()
@@ -69,27 +90,6 @@ def my_settings(character, s):
             chat.custom_channel("Endgame")
 
     chat.apply(s)
-
-    s["Show_Chat_TimeStamp"] = "true"
-    s["GUI_Current_Profile"] = "myprofile"
-    s["GUI_WelcomeWindowIsOpen"] = "false"
-    s["GUI_ShowCompletedReputations"] = "false"
-    s["GUI_ShowUnstartedReputations"] = "false"
-    s["GUI_ShowAlignment"] = "true"
-    s["GUI_InvitesAsSocialMessage"] = "true"
-    s["GUI_ShowCooldownText"] = "true"
-    s["GUI_CooldownStyle"] = "3"
-    s["GUI_GCDStyle"] = "1"
-    s["GUI_MiniMapZoom"] = "0.842999994755"
-    s["GUI_MapFadeTo"] = "50.0"
-    s["GUI_GCConfirmOpenPack"] = "false"
-    s["GUI_ConfirmAmplifierCharge"] = "false"
-    s["GUI_InventoryAutoCloseBank"] = "false"
-    s["GUI_InventoryAutoCloseVendor"] = "false"
-    s["GUI_QuickslotLockState"] = "true"
-    s["GUI_WhoListNumberInChat"] = "0"
-    s["GroupFinder_Operation_InProgress"] = "true"
-    s["GUI_CraftingMoveQuality"] = "6"
 
 
 if __name__ == "__main__":
