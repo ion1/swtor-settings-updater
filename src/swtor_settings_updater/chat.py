@@ -15,8 +15,9 @@ from swtor_settings_updater.util.character_class import (
 from swtor_settings_updater.util.swtor_case import swtor_lower
 
 
+MAXIMUM_CHANNEL_IX = 37
 CUSTOM_CHANNEL_IXS = range(22, 28 + 1)
-MAXIMUM_IX = 37
+UNUSED_CHANNEL_IXS = [4, 5, 14, 16, 21, 30, 31, 32]
 
 DEFAULT_COLOR = Color(238, 238, 0)
 
@@ -26,6 +27,10 @@ class Channel:
     name: str
     ix: int
     color: Color = dc.field(default_factory=lambda: DEFAULT_COLOR.copy())
+
+    def __post_init__(self) -> None:
+        if not 0 <= self.ix <= MAXIMUM_CHANNEL_IX or self.ix in UNUSED_CHANNEL_IXS:
+            raise ValueError(f"Invalid ix {self.ix!r}")
 
 
 @dc.dataclass
@@ -215,7 +220,7 @@ class Chat:
 
     def colors_setting(self) -> str:
         """Compute the value for the ChatColors setting."""
-        colors = [DEFAULT_COLOR.copy() for _ in range(MAXIMUM_IX + 1)]
+        colors = [DEFAULT_COLOR.copy() for _ in range(MAXIMUM_CHANNEL_IX + 1)]
         for c in chain(self.standard_channels, self.custom_channels.values()):
             colors[c.ix] = c.color
         return "".join(map(lambda c: f"{c.hex()};", colors))
@@ -259,6 +264,8 @@ class CustomChannel(Channel):
     ID_REGEX = regex.compile(r"usr\.[a-z0-9_]+")
 
     def __post_init__(self) -> None:
+        super().__post_init__()
+
         if not regex.fullmatch(CustomChannel.NAME_REGEX, self.name):
             raise ValueError(f"Invalid name {self.name!r}")
 

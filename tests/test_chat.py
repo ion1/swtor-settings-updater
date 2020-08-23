@@ -9,7 +9,15 @@ import hypothesis.strategies as st
 import pytest
 import regex
 
-from swtor_settings_updater.chat import Channel, Chat, CustomChannel, Panel
+from swtor_settings_updater.chat import (
+    Channel,
+    Chat,
+    CUSTOM_CHANNEL_IXS,
+    CustomChannel,
+    MAXIMUM_CHANNEL_IX,
+    Panel,
+    UNUSED_CHANNEL_IXS,
+)
 from swtor_settings_updater.color import Color
 from swtor_settings_updater.util.character_class import (
     CP1252_PRINTABLE,
@@ -22,15 +30,16 @@ from .test_color import valid_rgb
 valid_color = valid_rgb().map(lambda rgb: Color(*rgb))
 
 # See chat_channels.txt
-all_channel_ixs = set(range(37 + 1)) - {4, 5, 14, 16, 21, 30, 31, 32}
+all_channel_ixs = set(range(MAXIMUM_CHANNEL_IX + 1)) - set(UNUSED_CHANNEL_IXS)
 default_colors = (
     "b3ecff;ff7397;ff8022;a59ff3;eeee00;eeee00;b3ecff;b3ecff;b3ecff;1d8cfe;"
     "82ec89;ff00ff;efbc55;317a3c;eeee00;ff0000;eeee00;ff7f7f;eeee00;eeee00;"
     "eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;eeee00;ff5400;"
     "eeee00;eeee00;eeee00;a00000;c92e56;bb4fd2;1fab29;ff6600;"
 )
-num_custom_channels = 7
+num_custom_channels = len(CUSTOM_CHANNEL_IXS)
 
+valid_channel_ix = st.sampled_from(list(all_channel_ixs))
 valid_panel_name = st.from_regex(Panel.NAME_REGEX, fullmatch=True)
 valid_custom_channel_name = st.from_regex(CustomChannel.NAME_REGEX, fullmatch=True)
 valid_custom_channel_password = st.one_of(
@@ -388,6 +397,24 @@ def invalid_string(
         return strategy
 
 
+invalid_channel_ix = st.one_of(
+    st.sampled_from(UNUSED_CHANNEL_IXS),
+    st.integers(max_value=-1),
+    st.integers(min_value=MAXIMUM_CHANNEL_IX + 1),
+)
+
+
+@given(valid_channel_ix)
+def test_channel_accepts_valid_ix(ix: int) -> None:
+    assert Channel("", ix).ix == ix
+
+
+@given(invalid_channel_ix)
+def test_channel_rejects_invalid_ix(ix: int) -> None:
+    with pytest.raises(ValueError):
+        Channel("", ix)
+
+
 @given(valid_panel_name)
 def test_panel_accepts_valid_name(name: str) -> None:
     assert Panel(name).name == name
@@ -409,15 +436,16 @@ def test_panel_rejects_invalid_name(name: str) -> None:
 
 @given(
     valid_custom_channel_name,
+    valid_channel_ix,
     st.one_of(st.none(), valid_custom_channel_password),
     st.one_of(st.none(), valid_custom_channel_id),
 )
 def test_custom_channel_accepts_valid_parameters(
-    name: str, password: Optional[str], id: Optional[str]
+    name: str, ix: int, password: Optional[str], id: Optional[str]
 ) -> None:
-    cc = CustomChannel(name, 42, password=password, id=id)
+    cc = CustomChannel(name, ix, password=password, id=id)
     assert cc.name == name
-    assert cc.ix == 42
+    assert cc.ix == ix
     assert cc.password == password
     if id is None:
         assert cc.id == f"usr.{swtor_lower(name)}"
@@ -430,15 +458,23 @@ def test_custom_channel_accepts_valid_parameters(
         st.from_regex("[^A-Za-z0-9_]+", fullmatch=True),
         valid_custom_channel_name,
         empty_is_invalid=True,
-    )
+    ),
+    valid_channel_ix,
 )
-def test_custom_channel_rejects_invalid_name(name: str) -> None:
+def test_custom_channel_rejects_invalid_name(name: str, ix: int) -> None:
     with pytest.raises(ValueError):
-        CustomChannel(name, 42)
+        CustomChannel(name, ix)
+
+
+@given(valid_custom_channel_name, invalid_channel_ix)
+def test_custom_channel_rejects_invalid_ix(name: str, ix: int) -> None:
+    with pytest.raises(ValueError):
+        Channel(name, ix)
 
 
 @given(
     valid_custom_channel_name,
+    valid_channel_ix,
     invalid_string(
         st.from_regex(
             f"""(?:[ ;"&<>]|[^{regex_character_class(CP1252_PRINTABLE)}])+""",
@@ -448,13 +484,16 @@ def test_custom_channel_rejects_invalid_name(name: str) -> None:
         empty_is_invalid=True,
     ),
 )
-def test_custom_channel_rejects_invalid_password(name: str, password: str) -> None:
+def test_custom_channel_rejects_invalid_password(
+    name: str, ix: int, password: str
+) -> None:
     with pytest.raises(ValueError):
-        CustomChannel(name, 42, password=password)
+        CustomChannel(name, ix, password=password)
 
 
 @given(
     valid_custom_channel_name,
+    valid_channel_ix,
     st.one_of(
         st.from_regex(r"[a-z0-9_]+", fullmatch=True),  # Missing the usr. prefix
         invalid_string(
@@ -467,6 +506,6 @@ def test_custom_channel_rejects_invalid_password(name: str, password: str) -> No
         ).map(lambda s: f"usr.{s}"),
     ),
 )
-def test_custom_channel_rejects_invalid_id(name: str, id: str) -> None:
+def test_custom_channel_rejects_invalid_id(name: str, ix: int, id: str) -> None:
     with pytest.raises(ValueError):
-        CustomChannel(name, 42, id=id)
+        CustomChannel(name, ix, id=id)
