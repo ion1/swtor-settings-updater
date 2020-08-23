@@ -1,0 +1,35 @@
+name: tox
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  tox:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python: [3.8]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            .tox
+            .mypy_cache
+          key: ${{ runner.os }}-tox-${{ hashFiles('tox.ini') }}
+          restore-keys: |
+            ${{ runner.os }}-tox-
+
+      - name: Install tox
+        run: pip install tox
+
+      - name: Run tox
+        run: tox
