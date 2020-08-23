@@ -39,8 +39,8 @@ def regex_character_class(characters: str, exclusions: str = "") -> str:
         else:
             current_range = (c, c)
 
-    if current_range is not None:
-        ranges.append(current_range)
+    assert current_range is not None
+    ranges.append(current_range)
 
     regex_class = ""
     for first, last in ranges:
