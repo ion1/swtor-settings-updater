@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from swtor_settings_updater import default_settings_dir
+from swtor_settings_updater.util.settings_dir import default_settings_dir
 
 
 # TODO: pytest defines MonkeyPatch internally but does not seem to export it.
