@@ -1,4 +1,4 @@
-name: tox
+name: tests
 
 on:
   pull_request:
@@ -32,4 +32,13 @@ jobs:
         run: pip install tox
 
       - name: Run tox
-        run: tox
+        # Instead of running pre-commit through tox, run it as a GitHub action
+        # which uses caching.
+        run: TOX_SKIP_ENV='^pre-commit$' PY_COLORS=1 TOX_PARALLEL_NO_SPINNER=1 tox
+
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: pre-commit/action@v2.0.0
