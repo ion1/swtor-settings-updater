@@ -1,9 +1,14 @@
 from pathlib import Path
-from typing import Callable, Generator, MutableMapping, Union
+from typing import Callable
+from typing import Generator
+from typing import MutableMapping
+from typing import Union
 
 import pytest
 
-from swtor_settings_updater.character import CharacterMetadata, update_all, update_path
+from swtor_settings_updater.character import CharacterMetadata
+from swtor_settings_updater.character import update_all
+from swtor_settings_updater.character import update_path
 
 
 SETTINGS_PATH_A = Path("swtor/settings/he4242_Kai Zykken_PlayerGUIState.ini")

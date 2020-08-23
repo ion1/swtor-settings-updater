@@ -1,17 +1,21 @@
 from __future__ import annotations
 
-from collections import OrderedDict
 import dataclasses as dc
-from itertools import chain, zip_longest
-from typing import Iterable, Iterator, List, MutableMapping, Optional, Set
+from collections import OrderedDict
+from itertools import chain
+from itertools import zip_longest
+from typing import Iterable
+from typing import Iterator
+from typing import List
+from typing import MutableMapping
+from typing import Optional
+from typing import Set
 
 import regex
 
 from swtor_settings_updater.color import Color
-from swtor_settings_updater.util.character_class import (
-    CP1252_PRINTABLE,
-    regex_character_class,
-)
+from swtor_settings_updater.util.character_class import CP1252_PRINTABLE
+from swtor_settings_updater.util.character_class import regex_character_class
 from swtor_settings_updater.util.swtor_case import swtor_lower
 
 

@@ -1,16 +1,17 @@
 import codecs
-from typing import Any, Callable, Tuple
 import unicodedata
+from typing import Any
+from typing import Callable
+from typing import Tuple
 
-from hypothesis import assume, given
 import hypothesis.strategies as st
 import pytest
 import regex
+from hypothesis import assume
+from hypothesis import given
 
-from swtor_settings_updater.util.character_class import (
-    CP1252_PRINTABLE,
-    regex_character_class,
-)
+from swtor_settings_updater.util.character_class import CP1252_PRINTABLE
+from swtor_settings_updater.util.character_class import regex_character_class
 
 
 def test_cp1252_printable_encodes_as_cp1252() -> None:

@@ -2,9 +2,11 @@ import configparser
 import dataclasses as dc
 import logging
 import os
-from pathlib import Path
 import re
-from typing import Callable, MutableMapping, Union
+from pathlib import Path
+from typing import Callable
+from typing import MutableMapping
+from typing import Union
 
 from atomicwrites import atomic_write
 

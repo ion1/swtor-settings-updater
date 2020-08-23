@@ -10,6 +10,13 @@ repos:
     rev: v2.7.2
     hooks:
       - id: pyupgrade
+  - repo: https://github.com/asottile/reorder_python_imports
+    rev: v2.3.5
+    hooks:
+      - id: reorder-python-imports
+        args:
+          - --application-directories=src
+          - --py38-plus
   - repo: https://github.com/psf/black
     rev: 19.10b0
     hooks:
@@ -22,6 +29,5 @@ repos:
           - flake8-bugbear~=20.1.4
           - flake8-colors~=0.1.6
           - flake8-docstrings~=1.5.0
-          - flake8-import-order~=0.18.1
           - flake8-typing-imports~=1.9.0
           - pep8-naming~=0.11.1

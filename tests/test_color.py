@@ -1,8 +1,10 @@
-from typing import Any, Callable, Tuple
+from typing import Any
+from typing import Callable
+from typing import Tuple
 
-from hypothesis import given
 import hypothesis.strategies as st
 import pytest
+from hypothesis import given
 
 from swtor_settings_updater.color import Color
 

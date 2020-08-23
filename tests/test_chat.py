@@ -1,30 +1,32 @@
 from __future__ import annotations
 
-from collections import namedtuple, OrderedDict
-from typing import Any, Iterable, List, Optional
+from collections import namedtuple
+from collections import OrderedDict
+from typing import Any
+from typing import Iterable
+from typing import List
+from typing import Optional
 
-from hypothesis import assume, given
 import hypothesis.stateful as sta
 import hypothesis.strategies as st
 import pytest
 import regex
+from hypothesis import assume
+from hypothesis import given
 
-from swtor_settings_updater.chat import (
-    Channel,
-    Chat,
-    CUSTOM_CHANNEL_IXS,
-    CustomChannel,
-    MAXIMUM_CHANNEL_IX,
-    Panel,
-    UNUSED_CHANNEL_IXS,
-)
-from swtor_settings_updater.color import Color
-from swtor_settings_updater.util.character_class import (
-    CP1252_PRINTABLE,
-    regex_character_class,
-)
-from swtor_settings_updater.util.swtor_case import swtor_lower, swtor_upper
 from .test_color import valid_rgb
+from swtor_settings_updater.chat import Channel
+from swtor_settings_updater.chat import Chat
+from swtor_settings_updater.chat import CUSTOM_CHANNEL_IXS
+from swtor_settings_updater.chat import CustomChannel
+from swtor_settings_updater.chat import MAXIMUM_CHANNEL_IX
+from swtor_settings_updater.chat import Panel
+from swtor_settings_updater.chat import UNUSED_CHANNEL_IXS
+from swtor_settings_updater.color import Color
+from swtor_settings_updater.util.character_class import CP1252_PRINTABLE
+from swtor_settings_updater.util.character_class import regex_character_class
+from swtor_settings_updater.util.swtor_case import swtor_lower
+from swtor_settings_updater.util.swtor_case import swtor_upper
 
 
 valid_color = valid_rgb().map(lambda rgb: Color(*rgb))

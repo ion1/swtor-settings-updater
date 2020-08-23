@@ -1,8 +1,9 @@
-from hypothesis import given
 import hypothesis.strategies as st
 import regex
+from hypothesis import given
 
-from swtor_settings_updater.util.swtor_case import swtor_lower, swtor_upper
+from swtor_settings_updater.util.swtor_case import swtor_lower
+from swtor_settings_updater.util.swtor_case import swtor_upper
 
 
 @given(st.text())
