@@ -1,6 +1,6 @@
 # `swtor-settings-updater` Change Log
 
-## [v0.0.4](https://github.com/ion1/swtor-settings-updater/releases/tag/v0.0.3) – 2020-08-22
+## [v0.0.4](https://github.com/ion1/swtor-settings-updater/releases/tag/v0.0.4) – 2020-08-22
 
 - `Character` no longer needs to be a class. Change the methods to functions.
 
