@@ -11,8 +11,10 @@ from swtor_settings_updater.character import update_all
 from swtor_settings_updater.character import update_path
 
 
-SETTINGS_PATH_A = Path("swtor/settings/he4242_Kai Zykken_PlayerGUIState.ini")
-SETTINGS_PATH_B = Path("publictest/settings/HE4343_Plagueis_PlayerGUIState.ini")
+# The "HE" is case-insensitive. SWTOR seems to use "he" for some servers and "HE" for
+# others, in particular the PTS.
+SETTINGS_PATH_A = Path("swtor/settings/hE4242_Kai Zykken_PlayerGUIState.ini")
+SETTINGS_PATH_B = Path("publictest/settings/He4343_Plagueis_PlayerGUIState.ini")
 OTHER_PATH = Path("swtor/settings/Other.ini")
 
 # fmt: off
@@ -127,6 +129,7 @@ def test_character_update_path_parses_filename(
         nonlocal called
         called = True
         assert character.environment == "swtor"
+        # The server ID should be normalized to lower case.
         assert character.server_id == "he4242"
         assert character.name == "Kai Zykken"
 

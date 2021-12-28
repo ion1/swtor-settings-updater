@@ -11,6 +11,7 @@ from typing import Union
 from atomicwrites import atomic_write
 
 from swtor_settings_updater.util.option_transformer import OptionTransformer
+from swtor_settings_updater.util.swtor_case import swtor_lower
 
 
 @dc.dataclass
@@ -52,7 +53,8 @@ def update_path(path: Union[str, os.PathLike], callback: UpdateCallback) -> None
 
     metadata = CharacterMetadata(
         environment=environment,
-        server_id=match.group("server_id"),
+        # Normalize the server ID to lower case.
+        server_id=swtor_lower(match.group("server_id")),
         name=match.group("character_name"),
     )
 
