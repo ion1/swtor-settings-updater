@@ -1,6 +1,6 @@
 # `swtor-settings-updater` Change Log
 
-## UNRELEASED
+## [v0.0.7](https://github.com/ion1/swtor-settings-updater/releases/tag/v0.0.7) – 2021-12-28
 
 - [README](README.md): Avoid shadowing a variable in the example.
 - `character`: Normalize the server ID to lower case.
