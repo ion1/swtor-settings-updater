@@ -39,12 +39,12 @@ def update_path(path: Union[str, os.PathLike], callback: UpdateCallback) -> None
 
     # Examples:
     # .../SWTOR/swtor/settings/he4242_Kai Zykken_PlayerGUIState.ini
-    # .../SWTOR/publictest/settings/he4343_Plagueis_PlayerGUIState.ini
+    # .../SWTOR/publictest/settings/HE4343_Plagueis_PlayerGUIState.ini
 
     environment = path.parent.parent.name
 
     match = re.fullmatch(
-        r"(?P<server_id>he[^_]+)_(?P<character_name>[^_]+)_PlayerGUIState.ini",
+        r"(?P<server_id>[hH][eE][^_]+)_(?P<character_name>[^_]+)_PlayerGUIState.ini",
         path.name,
     )
     if not match:

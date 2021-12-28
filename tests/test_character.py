@@ -12,7 +12,7 @@ from swtor_settings_updater.character import update_path
 
 
 SETTINGS_PATH_A = Path("swtor/settings/he4242_Kai Zykken_PlayerGUIState.ini")
-SETTINGS_PATH_B = Path("publictest/settings/he4343_Plagueis_PlayerGUIState.ini")
+SETTINGS_PATH_B = Path("publictest/settings/HE4343_Plagueis_PlayerGUIState.ini")
 OTHER_PATH = Path("swtor/settings/Other.ini")
 
 # fmt: off
