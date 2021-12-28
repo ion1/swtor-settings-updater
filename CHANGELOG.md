@@ -1,5 +1,9 @@
 # `swtor-settings-updater` Change Log
 
+## UNRELEASED
+
+- [README](README.md): Avoid shadowing a variable in the example.
+
 ## [v0.0.6](https://github.com/ion1/swtor-settings-updater/releases/tag/v0.0.6) – 2021-12-28
 
 - `character` `update_all`: Missed a case-insensitive "HE" prefix.

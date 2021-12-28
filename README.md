@@ -15,7 +15,7 @@ import logging
 from swtor_settings_updater import character, Chat, default_settings_dir
 
 
-def my_settings(character, s):
+def my_settings(char, s):
     s["Show_Chat_TimeStamp"] = "true"
     s["GUI_Current_Profile"] = "myprofile"
     s["GUI_WelcomeWindowIsOpen"] = "false"
@@ -75,10 +75,10 @@ def my_settings(character, s):
         # chn.server_admin,
     )
 
-    if character.name not in ["Kai Zykken", "Plagueis"]:
+    if char.name not in ["Kai Zykken", "Plagueis"]:
         chat.custom_channel("Gsf")
 
-        if character.server_id == "he4000":
+        if char.server_id == "he4000":
             chat.custom_channel("Redleader")
             chat.custom_channel("Narwhal")
 
@@ -86,7 +86,7 @@ def my_settings(character, s):
             myguild.color = chn.guild.color
             other.display(myguild)
 
-        elif character.server_id in ["he3000", "he3001"]:
+        elif char.server_id in ["he3000", "he3001"]:
             chat.custom_channel("Endgame")
 
     chat.apply(s)
