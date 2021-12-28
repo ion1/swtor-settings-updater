@@ -1,8 +1,12 @@
 # `swtor-settings-updater` Change Log
 
+## UNRELEASED
+
+- `character` `update_all`: Missed a case-insensitive "HE" prefix.
+
 ## [v0.0.5](https://github.com/ion1/swtor-settings-updater/releases/tag/v0.0.5) – 2021-12-28
 
-- Case-independent "HE" prefix for PlayerGUIState.ini files.
+- Case-insensitive "HE" prefix for PlayerGUIState.ini files.
 
 ## [v0.0.4](https://github.com/ion1/swtor-settings-updater/releases/tag/v0.0.4) – 2020-08-22
 

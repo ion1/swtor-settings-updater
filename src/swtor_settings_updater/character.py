@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 def update_all(settings_dir: Union[str, os.PathLike], callback: UpdateCallback) -> None:
     settings_dir = Path(settings_dir)
 
-    for path in settings_dir.glob("*/settings/he*_*_PlayerGUIState.ini"):
+    for path in settings_dir.glob("*/settings/[hH][eE]*_*_PlayerGUIState.ini"):
         update_path(path, callback)
 
 
